@@ -2,7 +2,7 @@
 
 namespace Project_2_Web_Api.Service;
 
-public interface UserService
+public interface UserService 
 {
 	Task<IActionResult> Create(string UserJson);
 	Task<IActionResult> Delete(string id);

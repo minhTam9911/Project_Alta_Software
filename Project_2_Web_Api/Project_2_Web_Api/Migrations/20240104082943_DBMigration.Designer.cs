@@ -12,7 +12,7 @@ using Project_2_Web_API.Models;
 namespace Project_2_Web_Api.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240103135817_DBMigration")]
+    [Migration("20240104082943_DBMigration")]
     partial class DBMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -342,7 +342,7 @@ namespace Project_2_Web_Api.Migrations
                     b.ToTable("StaffUsers");
                 });
 
-            modelBuilder.Entity("Project_2_Web_API.Models.Task", b =>
+            modelBuilder.Entity("Project_2_Web_API.Models.TaskForVisit", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -521,7 +521,7 @@ namespace Project_2_Web_Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Project_2_Web_API.Models.Task", "Task")
+                    b.HasOne("Project_2_Web_API.Models.TaskForVisit", "Task")
                         .WithMany("Comments")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -608,7 +608,7 @@ namespace Project_2_Web_Api.Migrations
                     b.Navigation("Position");
                 });
 
-            modelBuilder.Entity("Project_2_Web_API.Models.Task", b =>
+            modelBuilder.Entity("Project_2_Web_API.Models.TaskForVisit", b =>
                 {
                     b.HasOne("Project_2_Web_API.Models.StaffUser", "StaffUserAssignee")
                         .WithMany()
@@ -683,7 +683,7 @@ namespace Project_2_Web_Api.Migrations
                     b.Navigation("Positions");
                 });
 
-            modelBuilder.Entity("Project_2_Web_API.Models.Task", b =>
+            modelBuilder.Entity("Project_2_Web_API.Models.TaskForVisit", b =>
                 {
                     b.Navigation("Comments");
                 });

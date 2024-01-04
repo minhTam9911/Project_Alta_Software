@@ -20,7 +20,7 @@ public class DatabaseContext : DbContext
 	public DbSet<Position> Positions {  get; set; }
 	public DbSet<Post> Posts { get; set; }
 	public DbSet<StaffUser> StaffUsers { get; set; }
-	public DbSet<Task> Tasks { get; set; }
+	public DbSet<TaskForVisit> Tasks { get; set; }
 	public DbSet<Visit> Visits { get; set; }
 
 }

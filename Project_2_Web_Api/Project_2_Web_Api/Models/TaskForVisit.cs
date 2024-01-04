@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project_2_Web_API.Models;
 
-public class Task
+public class TaskForVisit
 {
 	[Key]
 	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]

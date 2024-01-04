@@ -11,18 +11,9 @@ public class UserServiceImpl : UserService
 {
 	private DatabaseContext db;
 
-/*	public IActionResult Create(string UserJson)
-	{
-		try
-		{
-			
-			
-		}
-		catch(Exception ex)
-		{
-			
-		}
-	}*/
+
+
+	
 
 	public Task<IActionResult> Delete(string id)
 	{

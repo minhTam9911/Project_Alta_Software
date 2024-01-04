@@ -23,5 +23,5 @@ public class Comment
 	[ForeignKey("AccountId")]
 	public virtual User Account { get; set; } = null!;
 
-	public virtual Task Task { get; set; } = null!;
+	public virtual TaskForVisit Task { get; set; } = null!;
 }
