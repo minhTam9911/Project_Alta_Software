@@ -68,3 +68,5 @@ C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web
 C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web_Api\Project_2_Web_Api\obj\Debug\net6.0\Project_2_Web_Api.pdb
 C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web_Api\Project_2_Web_Api\obj\Debug\net6.0\Project_2_Web_Api.genruntimeconfig.cache
 C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web_Api\Project_2_Web_Api\obj\Debug\net6.0\ref\Project_2_Web_Api.dll
+C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web_Api\Project_2_Web_Api\bin\Debug\net6.0\BCrypt.Net-Next.dll
+C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web_Api\Project_2_Web_Api\bin\Debug\net6.0\Newtonsoft.Json.dll
