@@ -3,10 +3,10 @@ using Project_2_Web_API.Models;
 
 namespace Project_2_Web_Api.Service;
 
-public interface PositionService
+public interface GrantPermissionService
 {
-	Task<IActionResult> Create(Position position);
-	Task<IActionResult> Update(int id, Position position);
+	Task<IActionResult> Create(GrantPermission grantPermission);
+	Task<IActionResult> Update(int id, GrantPermission grantPermission);
 	Task<IActionResult> Delete(int id);
 	Task<dynamic> FindAll();
 	Task<dynamic> FindById(int id);

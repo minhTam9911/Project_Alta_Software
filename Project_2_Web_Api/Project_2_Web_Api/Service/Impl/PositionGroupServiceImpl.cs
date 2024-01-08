@@ -108,7 +108,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 			else
 			{
 				return await db.PositionGroups.Select(x=>new {
-					id = x.Id, name = x.Name,
+					id = x.Id, name = x.Name,created = x.Created
 				}).ToListAsync();
 			}
 		}
@@ -132,6 +132,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 				dynamic data = db.PositionGroups.Where(i=>i.Id == Int32.Parse(id)).Select(x => new {
 					id = x.Id,
 					name = x.Name,
+					created = x.Created
 				}).FirstOrDefaultAsync();
 				return await data;
 			}
@@ -156,6 +157,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 				dynamic data = db.PositionGroups.Where(i=>i.Name.ToLower().Contains(name.ToLower())).Select(x => new {
 					id = x.Id,
 					name = x.Name,
+					created = x.Created
 				}).ToListAsync();
 				return await data;
 			}
@@ -237,8 +239,9 @@ public class PositionGroupServiceImpl : PositionGroupService
 					{
 						return new BadRequestObjectResult(new { msg = "Name Position Group already exist!" });
 					}
-					positionGroup.Id = Int32.Parse(id);
-					db.Entry(positionGroup).State = EntityState.Modified;
+					var data = await db.PositionGroups.FindAsync(Int32.Parse(id));
+					data.Name = positionGroup.Name;
+					db.Entry(data).State = EntityState.Modified;
 					int check = await db.SaveChangesAsync();
 					if (check > 0)
 					{

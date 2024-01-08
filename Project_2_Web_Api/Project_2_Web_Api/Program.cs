@@ -13,7 +13,7 @@ builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<PositionGroupService, PositionGroupServiceImpl>();
-
+builder.Services.AddScoped<PositionService, PositionServiceImpl>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

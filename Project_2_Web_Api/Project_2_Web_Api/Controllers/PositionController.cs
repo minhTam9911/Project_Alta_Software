@@ -1,48 +1,43 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Project_2_Web_Api.Service;
 using Project_2_Web_API.Models;
 
-
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class PositionGroupController : ControllerBase
+public class PositionController : ControllerBase
 {
 
-	private readonly PositionGroupService positionGroupService;
-	public PositionGroupController(PositionGroupService positionGroupService)
+	private readonly PositionService positionService;
+	public PositionController(PositionService positionService)
 	{
-		this.positionGroupService = positionGroupService;
+		this.positionService = positionService;
 	}
-
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpGet("find-all")]
-	public  async Task<IActionResult> GetAll()
+	public async Task<IActionResult> GetAll()
 	{
 		try
 		{
-			return  Ok( await positionGroupService.FindAll());
-		}
-		catch(Exception ex)
+			return Ok(await positionService.FindAll());
+		}catch(Exception ex)
 		{
 			return BadRequest(new { msg = ex.Message });
 		}
-		
 	}
-
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpGet("find-by-id/{id}")]
-	public async Task<IActionResult> GetById(string id)
+	public async Task<IActionResult> GetById(int id)
 	{
 		try
 		{
-			return Ok(await positionGroupService.FindById(id));
+			return Ok(await positionService.FindById(id));
 		}
 		catch (Exception ex)
 		{
@@ -57,7 +52,7 @@ public class PositionGroupController : ControllerBase
 	{
 		try
 		{
-			return Ok(await positionGroupService.FindByName(name));
+			return Ok(await positionService.FindByName(name));
 		}
 		catch (Exception ex)
 		{
@@ -65,31 +60,28 @@ public class PositionGroupController : ControllerBase
 		}
 	}
 
-	
+
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPost("create")]
-	public async Task<IActionResult> Create([FromBody]PositionGroup value)
+	public async Task<IActionResult> Create([FromBody] Position position)
 	{
-		return await positionGroupService.Create(value);
+		return await positionService.Create(position);
 	}
-	
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("update/{id}")]
-	public async Task<IActionResult> Update(string id, [FromBody] PositionGroup value)
+	public async Task<IActionResult> Update(int id, [FromBody] Position position)
 	{
-		return await positionGroupService.Update(id, value);
+		return await positionService.Update(id, position);
 	}
-
-	
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpDelete("delete/{id}")]
-	public async Task<IActionResult> Delete(string id)
+	public  async Task<IActionResult> Delete(int id)
 	{
-		return await positionGroupService.Delete(id);
+		return await positionService.Delete(id);
 	}
 }
