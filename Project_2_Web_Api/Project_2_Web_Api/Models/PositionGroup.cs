@@ -14,4 +14,6 @@ public partial class PositionGroup
 	public DateTime? Created { get; set; }
 
 	public virtual ICollection<Position> Positions { get; set; } = new List<Position>();
+
+	
 }

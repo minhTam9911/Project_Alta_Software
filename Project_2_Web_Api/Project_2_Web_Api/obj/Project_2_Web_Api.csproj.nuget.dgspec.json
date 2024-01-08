@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_Api\\Project_2_Web_Api\\Project_2_Web_Api.csproj": {}
+    "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_API\\Project_2_Web_Api\\Project_2_Web_Api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_Api\\Project_2_Web_Api\\Project_2_Web_Api.csproj": {
+    "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_API\\Project_2_Web_Api\\Project_2_Web_Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_Api\\Project_2_Web_Api\\Project_2_Web_Api.csproj",
+        "projectUniqueName": "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_API\\Project_2_Web_Api\\Project_2_Web_Api.csproj",
         "projectName": "Project_2_Web_Api",
-        "projectPath": "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_Api\\Project_2_Web_Api\\Project_2_Web_Api.csproj",
+        "projectPath": "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_API\\Project_2_Web_Api\\Project_2_Web_Api.csproj",
         "packagesPath": "C:\\Users\\minht\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_Api\\Project_2_Web_Api\\obj\\",
+        "outputPath": "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_API\\Project_2_Web_Api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\minht\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -44,6 +44,14 @@
               "target": "Package",
               "version": "[4.0.3, )"
             },
+            "Microsoft.AspNet.WebApi.Core": {
+              "target": "Package",
+              "version": "[5.3.0, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[6.0.25, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[6.0.25, )"
@@ -75,6 +83,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.5.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[6.33.0, )"
             }
           },
           "imports": [

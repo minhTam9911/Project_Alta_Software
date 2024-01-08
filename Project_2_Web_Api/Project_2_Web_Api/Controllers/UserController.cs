@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Project_2_Web_Api.Service;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -7,6 +8,12 @@ namespace Project_2_Web_Api.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
+	private readonly UserServiceAccessor _userServiceAccessor;
+	public UserController(UserServiceAccessor userServiceAccessor)
+	{
+		_userServiceAccessor = userServiceAccessor;
+	}
+
 	// GET: api/<UserController>
 	[HttpGet]
 	public IEnumerable<string> Get()
@@ -18,6 +25,7 @@ public class UserController : ControllerBase
 	[HttpGet("{id}")]
 	public string Get(int id)
 	{
+		
 		return "value";
 	}
 

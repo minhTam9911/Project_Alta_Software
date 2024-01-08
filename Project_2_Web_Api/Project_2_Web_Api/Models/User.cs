@@ -6,7 +6,7 @@ namespace Project_2_Web_API.Models;
 
 public partial class User
 {
-	[Key,]
+	[Key]
 	public Guid Id { get; set; }
 	[Required]
 	public string? FullName { get; set; }
