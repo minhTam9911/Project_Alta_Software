@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
 using Project_2_Web_API.Models;
 
@@ -69,18 +70,18 @@ public class PositionGroupController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPost("create")]
-	public async Task<IActionResult> Create([FromBody]PositionGroup value)
+	public async Task<IActionResult> Create([FromBody]PositionGroupDTO request)
 	{
-		return await positionGroupService.Create(value);
+		return await positionGroupService.Create(request);
 	}
 	
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("update/{id}")]
-	public async Task<IActionResult> Update(string id, [FromBody] PositionGroup value)
+	public async Task<IActionResult> Update(string id, [FromBody] PositionGroupDTO request)
 	{
-		return await positionGroupService.Update(id, value);
+		return await positionGroupService.Update(id, request);
 	}
 
 	

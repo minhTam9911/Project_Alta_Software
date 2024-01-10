@@ -8,13 +8,13 @@ using Project_2_Web_API.Models;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class PositionController : ControllerBase
+public class GrantPermissionController : ControllerBase
 {
 
-	private readonly PositionService positionService;
-	public PositionController(PositionService positionService)
+	private readonly GrantPermissionService grantPermissionService;
+	public GrantPermissionController(GrantPermissionService grantPermissionService)
 	{
-		this.positionService = positionService;
+		this.grantPermissionService = grantPermissionService;
 	}
 
 	[Produces("application/json")]
@@ -24,10 +24,10 @@ public class PositionController : ControllerBase
 	{
 		try
 		{
-			return Ok(await positionService.FindAll());
+			return Ok(await grantPermissionService.FindAll());
 		}catch(Exception ex)
 		{
-			return BadRequest(new { msg = ex.Message });
+			return BadRequest(new { error = ex.Message });
 		}
 	}
 
@@ -38,11 +38,11 @@ public class PositionController : ControllerBase
 	{
 		try
 		{
-			return Ok(await positionService.FindById(id));
+			return Ok(await grantPermissionService.FindById(id));
 		}
 		catch (Exception ex)
 		{
-			return BadRequest(new { msg = ex.Message });
+			return BadRequest(new { error = ex.Message });
 		}
 	}
 
@@ -53,36 +53,35 @@ public class PositionController : ControllerBase
 	{
 		try
 		{
-			return Ok(await positionService.FindByName(name));
+			return Ok(await grantPermissionService.FindByName(name));
 		}
 		catch (Exception ex)
 		{
-			return BadRequest(new { msg = ex.Message });
+			return BadRequest(new { error = ex.Message });
 		}
 	}
-
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPost("create")]
-	public async Task<IActionResult> Create([FromBody] PositionDTO request)
+	public async Task<IActionResult> Create([FromBody]GrantPermissionDTO request)
 	{
-		return await positionService.Create(request);
+		return await grantPermissionService.Create(request);
 	}
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("update/{id}")]
-	public async Task<IActionResult> Update(int id, [FromBody] PositionDTO request)
+	public async Task<IActionResult> Put(int id, [FromBody] GrantPermissionDTO request)
 	{
-		return await positionService.Update(id, request);
+		return await grantPermissionService.Update(id, request);
 	}
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpDelete("delete/{id}")]
-	public  async Task<IActionResult> Delete(int id)
+	public async Task<IActionResult> Delete(int id)
 	{
-		return await positionService.Delete(id);
+		return await grantPermissionService.Delete(id);
 	}
 }

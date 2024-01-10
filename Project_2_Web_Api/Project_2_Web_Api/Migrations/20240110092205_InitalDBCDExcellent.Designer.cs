@@ -12,8 +12,8 @@ using Project_2_Web_API.Models;
 namespace Project_2_Web_Api.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240104082943_DBMigration")]
-    partial class DBMigration
+    [Migration("20240110092205_InitalDBCDExcellent")]
+    partial class InitalDBCDExcellent
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -87,6 +87,9 @@ namespace Project_2_Web_Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("AreaId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CreateBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -135,6 +138,8 @@ namespace Project_2_Web_Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AreaId");
 
                     b.HasIndex("PositionId");
 
@@ -389,7 +394,7 @@ namespace Project_2_Web_Api.Migrations
 
                     b.HasIndex("ReportingStaffUserId");
 
-                    b.ToTable("Tasks");
+                    b.ToTable("TaskForVisit");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.User", b =>
@@ -534,6 +539,10 @@ namespace Project_2_Web_Api.Migrations
 
             modelBuilder.Entity("Project_2_Web_API.Models.Distributor", b =>
                 {
+                    b.HasOne("Project_2_Web_API.Models.Area", null)
+                        .WithMany("Distributors")
+                        .HasForeignKey("AreaId");
+
                     b.HasOne("Project_2_Web_API.Models.Position", "Position")
                         .WithMany()
                         .HasForeignKey("PositionId")
@@ -670,6 +679,8 @@ namespace Project_2_Web_Api.Migrations
 
             modelBuilder.Entity("Project_2_Web_API.Models.Area", b =>
                 {
+                    b.Navigation("Distributors");
+
                     b.Navigation("StaffUsers");
                 });
 

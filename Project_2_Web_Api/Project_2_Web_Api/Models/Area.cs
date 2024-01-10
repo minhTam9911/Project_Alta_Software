@@ -11,4 +11,5 @@ public partial class Area
 	public string? Code { set; get; }
 	public string? Name { get; set; }
 	public virtual ICollection<StaffUser>? StaffUsers { get; set; } = new List<StaffUser>();
+	public virtual ICollection<Distributor>? Distributors { get; set; } = new List<Distributor>();
 }

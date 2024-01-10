@@ -1,8 +1,11 @@
 ﻿
 
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Project_2_Web_Api.DTO;
 using Project_2_Web_API.Models;
 
 namespace Project_2_Web_Api.Service.Impl;
@@ -11,28 +14,57 @@ public class UserServiceImpl : UserService
 {
 	private DatabaseContext db;
 	private readonly IHttpContextAccessor _httpContextAccessor;
-	public UserServiceImpl(DatabaseContext db)
+	private readonly IMapper mapper;
+	public UserServiceImpl(DatabaseContext db, IHttpContextAccessor httpContextAccessor, IMapper mapper)
 	{
+		this.mapper = mapper;
+		_httpContextAccessor = httpContextAccessor;
 		this.db = db;
 	}
 
-	public Task<IActionResult> FindById(int id)
+	public Task<dynamic> FindById(int id)
 	{
 		throw new NotImplementedException();
 	}
 
-	public async Task<IActionResult> Create(string userJson)
+	public async Task<IActionResult> Create(StaffUserDTO staffUserDto)
 	{
+		var modelState = _httpContextAccessor.HttpContext?.Items["MS_ModelState"] as ModelStateDictionary;
+		var staffUser = mapper.Map<StaffUser>(staffUserDto);
 		try
 		{
-			var modelState = _httpContextAccessor.HttpContext?.Items["MS_ModelState"] as ModelStateDictionary;
+			
 			if(modelState != null && !modelState.IsValid)
 			{
 				return new BadRequestObjectResult(modelState);
 			}
 			else
 			{
-				return new BadRequestObjectResult(modelState);
+				if(await db.StaffUsers.FirstOrDefaultAsync(x=>x.Email == staffUser.Email) != null)
+				{
+					return new BadRequestObjectResult(new {error = "Email already exist!!"});
+				}
+				if (await db.Positions.FindAsync(staffUser.PositionId) == null)
+				{
+					return new BadRequestObjectResult(new { error = "Position not exist!!" });
+				}
+				else
+				{
+					staffUser.CreatedDate = DateTime.Now;
+					var hashPassword = BCrypt.Net.BCrypt.HashPassword(staffUser.Password);
+					staffUser.Password = hashPassword;
+					staffUser.IsStatus = false;
+					staffUser.TokenRefresh = "unactive";
+					db.StaffUsers.Add(staffUser);
+					if (await db.SaveChangesAsync() > 0)
+					{
+						return new OkObjectResult(new { msg =  "Added successfully !!"});
+					}
+					else
+					{
+						return new BadRequestObjectResult(new { error = "Added failure !!" });
+					}
+				}
 			}
 		}
 		catch(Exception ex)
@@ -41,7 +73,7 @@ public class UserServiceImpl : UserService
 		}
 	}
 
-	public Task<IActionResult> Update(string userJson)
+	public async Task<IActionResult> Update(Guid id, StaffUserDTO staffUserDto)
 	{
 		throw new NotImplementedException();
 	}
@@ -51,8 +83,25 @@ public class UserServiceImpl : UserService
 		throw new NotImplementedException();
 	}
 
-	public Task<IActionResult> FindAll()
+	public async Task<dynamic> FindAll()
 	{
-		throw new NotImplementedException();
+		try
+		{
+
+			if (await db.StaffUsers.ToListAsync() == null)
+			{
+				return new BadRequestObjectResult(new { error = "Data is null !!!" });
+			}
+			return await db.StaffUsers.Select(x => new
+			{
+				id = x.Id,
+				fullname = x.Fullname,
+				email = x.Email
+			}).ToListAsync();
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult(new { error = ex.Message });
+		}
 	}
 }

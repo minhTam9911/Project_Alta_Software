@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Project_2_Web_Api.DTO;
 
 namespace Project_2_Web_Api.Service;
 
 public interface UserService 
 {
-	Task<IActionResult> FindById(int id);
-	Task<IActionResult> Create(string userJson);
-	Task<IActionResult> Update(string userJson);
+	Task<dynamic> FindById(int id);
+	Task<IActionResult> Create(StaffUserDTO staffUserDto);
+	Task<IActionResult> Update(Guid id, StaffUserDTO staffUserDto);
 	Task<IActionResult> Delete(string id);
-	Task<IActionResult> FindAll();
+	Task<dynamic> FindAll();
 
 }

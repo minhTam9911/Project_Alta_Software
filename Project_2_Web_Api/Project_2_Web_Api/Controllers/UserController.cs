@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -8,31 +9,36 @@ namespace Project_2_Web_Api.Controllers;
 [ApiController]
 public class UserController : ControllerBase
 {
-	private readonly UserServiceAccessor _userServiceAccessor;
-	public UserController(UserServiceAccessor userServiceAccessor)
+/*	private readonly UserServiceAccessor _userServiceAccessor;*/
+	private readonly UserService userService;
+	public UserController(UserServiceAccessor userServiceAccessor, UserService userService)
 	{
-		_userServiceAccessor = userServiceAccessor;
+	//	_userServiceAccessor = userServiceAccessor;
+		this.userService = userService;
 	}
 
-	// GET: api/<UserController>
-	[HttpGet]
-	public IEnumerable<string> Get()
+	[Produces("application/json")]
+	[Consumes("application/json")]
+	[HttpGet("find-all")]
+	public async Task<IActionResult> GetAll()
 	{
-		return new string[] { "value1", "value2" };
+		try
+		{
+			return Ok(await userService.FindAll());
+		}catch(Exception ex)
+		{
+			return BadRequest(new { error = ex.Message });
+		}
 	}
 
-	// GET api/<UserController>/5
-	[HttpGet("{id}")]
-	public string Get(int id)
-	{
-		
-		return "value";
-	}
+	
 
-	// POST api/<UserController>
-	[HttpPost]
-	public void Post([FromBody] string value)
+	[Produces("application/json")]
+	[Consumes("application/json")]
+	[HttpPost("create")]
+	public async Task<IActionResult> Create([FromBody] StaffUserDTO request)
 	{
+		return await userService.Create(request);
 	}
 
 	// PUT api/<UserController>/5

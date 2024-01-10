@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Project_2_Web_Api.DTO;
 using Project_2_Web_API.Models;
 
 namespace Project_2_Web_Api.Service.Impl;
@@ -10,10 +12,12 @@ public class PositionGroupServiceImpl : PositionGroupService
 {
 	private DatabaseContext db;
 	private readonly IHttpContextAccessor httpContextAccessor;
-	public PositionGroupServiceImpl(DatabaseContext db, IHttpContextAccessor httpContextAccessor)
+	private readonly IMapper mapper;
+	public PositionGroupServiceImpl(DatabaseContext db, IHttpContextAccessor httpContextAccessor, IMapper mapper)
 	{
 		this.db = db;
 		this.httpContextAccessor = httpContextAccessor;
+		this.mapper = mapper;
 	}
 
 	/*public async Task<IActionResult> Create(string positionGroup, string role)
@@ -74,7 +78,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 		{
 			if(await db.PositionGroups.FindAsync(Int32.Parse(id)) == null)
 			{
-				return new BadRequestObjectResult(new { msg = "id does not exist!" });
+				return new BadRequestObjectResult(new { error = "id does not exist!" });
 			}
 			else
 			{
@@ -86,12 +90,12 @@ public class PositionGroupServiceImpl : PositionGroupService
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { msg = "Delete Failed!" });
+					return new BadRequestObjectResult(new { error = "Delete Failed!" });
 				}
 			}
 		}catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new { msg = ex });
+			return new BadRequestObjectResult(new { error = ex.Message });
 		}
 	}
 
@@ -99,11 +103,9 @@ public class PositionGroupServiceImpl : PositionGroupService
 	{
 		try
 		{
-			var positionGroups = await db.PositionGroups.ToListAsync();
-
-			if (positionGroups == null)
+			if ( await db.PositionGroups.AnyAsync() == false)
 			{
-				return new OkObjectResult(new { msg = "The table is empty/null!!" });
+				return new { msg = "Data is null !!!" };
 			}
 			else
 			{
@@ -114,7 +116,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 		}
 		catch(Exception ex)
 		{
-			return ex.Message;
+			return new { error = ex.Message };
 		}
 	}
 
@@ -123,23 +125,22 @@ public class PositionGroupServiceImpl : PositionGroupService
 
 		try
 		{
-			if (await db.PositionGroups.FirstOrDefaultAsync(x=>x.Id == Int32.Parse(id)) == null)
+			if (await db.PositionGroups.AnyAsync() == false || await db.PositionGroups.FindAsync(id) == null)
 			{
-				return new OkObjectResult(new { msg = "The table is empty/null !!" });
+				return new { msg = "Data is null !!!" };
 			}
 			else
 			{
-				dynamic data = db.PositionGroups.Where(i=>i.Id == Int32.Parse(id)).Select(x => new {
+				return await db.PositionGroups.Where(i=>i.Id == Int32.Parse(id)).Select(x => new {
 					id = x.Id,
 					name = x.Name,
 					created = x.Created
 				}).FirstOrDefaultAsync();
-				return await data;
 			}
 		}
 		catch (Exception ex)
 		{
-			return ex.Message;
+			return new { error = ex.Message };
 		}
 	}
 
@@ -148,39 +149,33 @@ public class PositionGroupServiceImpl : PositionGroupService
 
 		try
 		{
-			if ( await db.PositionGroups.ToListAsync() == null)
+			if (await db.PositionGroups.AnyAsync() == false || await db.PositionGroups.FirstOrDefaultAsync(i => i.Name.ToLower().Contains(name.ToLower())) == null)
 			{
-				return new OkObjectResult(new { msg = "The table is empty/null !!" });
+				return new { msg = "Data is null !!!" };
 			}
 			else
 			{
-				dynamic data = db.PositionGroups.Where(i=>i.Name.ToLower().Contains(name.ToLower())).Select(x => new {
+				return await db.PositionGroups.Where(i=>i.Name.ToLower().Contains(name.ToLower())).Select(x => new {
 					id = x.Id,
 					name = x.Name,
 					created = x.Created
 				}).ToListAsync();
-				return await data;
 			}
 		}
 		catch (Exception ex)
 		{
-			return ex.Message;
+			return new { error = ex.Message };
 		}
 	}
 
-	public async Task<IActionResult> Create(PositionGroup positionGroup)
+	public async Task<IActionResult> Create(PositionGroupDTO positionGroupDTO)
 	{
-
+		var positionGroup = mapper.Map<PositionGroup>(positionGroupDTO);
 		var modelState = httpContextAccessor.HttpContext?.Items["MS_ModelState"] as ModelStateDictionary;
 		try
 		{
-			if (positionGroup == null)
-			{
-				return new BadRequestObjectResult(new { msg = "Data request is null!!!" });
-			}
-			else
-			{
-
+			
+			
 				if (modelState != null && !modelState.IsValid)
 				{
 					return new BadRequestObjectResult(modelState);
@@ -188,7 +183,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 				else
 				{
 					
-						if (db.PositionGroups.FirstOrDefault(x => x.Name.ToLower() == positionGroup.Name.ToLower()) != null)
+						if (await db.PositionGroups.FirstOrDefaultAsync(x => x.Name.ToLower() == positionGroup.Name.ToLower()) != null)
 						{
 							return new BadRequestObjectResult(new { msg = "Name Position Group already exist!" });
 						}
@@ -201,32 +196,27 @@ public class PositionGroupServiceImpl : PositionGroupService
 						}
 						else
 						{
-							return new BadRequestObjectResult(new { msg = "Added failure!" });
+							return new BadRequestObjectResult(new { error = "Added failure!" });
 						}
 
 					
 				}
-			}
+			
 
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { msg = ex.Message });
+			return new BadRequestObjectResult(new { error = ex.Message });
 		}
 	}
 
-	public async Task<IActionResult> Update(string id, PositionGroup positionGroup)
+	public async Task<IActionResult> Update(string id, PositionGroupDTO positionGroupDTO)
 	{
-
+		var positionGroup = mapper.Map<PositionGroup>(positionGroupDTO);
 		var modelState = httpContextAccessor.HttpContext?.Items["MS_ModelState"] as ModelStateDictionary;
 		try
 		{
-			if (positionGroup == null)
-			{
-				return new BadRequestObjectResult(new { msg = "Data request is null!!!" });
-			}
-			else
-			{
+			
 
 				if (modelState != null && !modelState.IsValid)
 				{
@@ -235,7 +225,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 				else
 				{
 
-					if (db.PositionGroups.FirstOrDefault(x => x.Name.ToLower() == positionGroup.Name.ToLower()) != null)
+					if (await db.PositionGroups.FirstOrDefaultAsync(x => x.Name.ToLower() == positionGroup.Name.ToLower() && x.Id !=int.Parse(id)) != null)
 					{
 						return new BadRequestObjectResult(new { msg = "Name Position Group already exist!" });
 					}
@@ -249,11 +239,11 @@ public class PositionGroupServiceImpl : PositionGroupService
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { msg = "Update failure!" });
+						return new BadRequestObjectResult(new { error = "Update failure!" });
 					}
 
 
-				}
+				
 			}
 		}
 		catch (Exception ex)

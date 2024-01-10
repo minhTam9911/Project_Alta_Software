@@ -11,9 +11,14 @@ var connectString = builder.Configuration["Connection:DefaultString"];
 builder.Services.AddDbContext<DatabaseContext>(option => option.UseLazyLoadingProxies().UseSqlServer(connectString));
 builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddScoped<PositionGroupService, PositionGroupServiceImpl>();
 builder.Services.AddScoped<PositionService, PositionServiceImpl>();
+builder.Services.AddScoped<GrantPermissionService,GrantPermissionServiceImpl>();
+builder.Services.AddScoped<AreaService,AreaServiceImpl>();
+builder.Services.AddScoped<UserService, UserServiceImpl>();
+builder.Services.AddScoped<UserServiceAccessor, UserServiceAccessorImpl>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Project_2_Web_Api.Migrations
 {
-    public partial class DBMigration : Migration
+    public partial class InitalDBCDExcellent : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -143,11 +143,17 @@ namespace Project_2_Web_Api.Migrations
                     ExpireDateToken = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreateBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PositionId = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AreaId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Distributors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Distributors_Areas_AreaId",
+                        column: x => x.AreaId,
+                        principalTable: "Areas",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Distributors_Positions_PositionId",
                         column: x => x.PositionId,
@@ -190,7 +196,7 @@ namespace Project_2_Web_Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tasks",
+                name: "TaskForVisit",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -207,15 +213,15 @@ namespace Project_2_Web_Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tasks", x => x.Id);
+                    table.PrimaryKey("PK_TaskForVisit", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tasks_StaffUsers_AssignedStaffUserId",
+                        name: "FK_TaskForVisit_StaffUsers_AssignedStaffUserId",
                         column: x => x.AssignedStaffUserId,
                         principalTable: "StaffUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_Tasks_StaffUsers_ReportingStaffUserId",
+                        name: "FK_TaskForVisit_StaffUsers_ReportingStaffUserId",
                         column: x => x.ReportingStaffUserId,
                         principalTable: "StaffUsers",
                         principalColumn: "Id",
@@ -333,9 +339,9 @@ namespace Project_2_Web_Api.Migrations
                 {
                     table.PrimaryKey("PK_Comments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Comments_Tasks_TaskId",
+                        name: "FK_Comments_TaskForVisit_TaskId",
                         column: x => x.TaskId,
-                        principalTable: "Tasks",
+                        principalTable: "TaskForVisit",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -355,6 +361,11 @@ namespace Project_2_Web_Api.Migrations
                 name: "IX_Comments_TaskId",
                 table: "Comments",
                 column: "TaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Distributors_AreaId",
+                table: "Distributors",
+                column: "AreaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Distributors_PositionId",
@@ -407,13 +418,13 @@ namespace Project_2_Web_Api.Migrations
                 column: "StaffSuperiorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tasks_AssignedStaffUserId",
-                table: "Tasks",
+                name: "IX_TaskForVisit_AssignedStaffUserId",
+                table: "TaskForVisit",
                 column: "AssignedStaffUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tasks_ReportingStaffUserId",
-                table: "Tasks",
+                name: "IX_TaskForVisit_ReportingStaffUserId",
+                table: "TaskForVisit",
                 column: "ReportingStaffUserId");
 
             migrationBuilder.CreateIndex(
@@ -453,7 +464,7 @@ namespace Project_2_Web_Api.Migrations
                 name: "Visits");
 
             migrationBuilder.DropTable(
-                name: "Tasks");
+                name: "TaskForVisit");
 
             migrationBuilder.DropTable(
                 name: "Users");

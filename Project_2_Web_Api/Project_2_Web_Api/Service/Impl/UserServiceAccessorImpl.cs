@@ -2,18 +2,7 @@
 
 public class UserServiceAccessorImpl : UserServiceAccessor
 {
-	private readonly IConfiguration _configuration;
-	private readonly HttpClient _httpClient;
-	private  IHttpContextAccessor _httpContextAccessor;
-	public UserServiceAccessorImpl(
-		IConfiguration configuration,
-		HttpClient httpClient,
-		IHttpContextAccessor httpContextAccessor)
-	{
-		_configuration = configuration;
-		_httpClient = httpClient;
-		_httpContextAccessor = httpContextAccessor;
-	}
+	
 
 	public string GetCurrentUserId()
 	{
