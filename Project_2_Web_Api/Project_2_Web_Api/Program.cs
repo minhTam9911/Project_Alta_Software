@@ -16,7 +16,7 @@ builder.Services.AddScoped<PositionGroupService, PositionGroupServiceImpl>();
 builder.Services.AddScoped<PositionService, PositionServiceImpl>();
 builder.Services.AddScoped<GrantPermissionService,GrantPermissionServiceImpl>();
 builder.Services.AddScoped<AreaService,AreaServiceImpl>();
-builder.Services.AddScoped<UserService, UserServiceImpl>();
+builder.Services.AddScoped<StaffUserService, StaffUserServiceImpl>();
 builder.Services.AddScoped<UserServiceAccessor, UserServiceAccessorImpl>();
 
 var app = builder.Build();

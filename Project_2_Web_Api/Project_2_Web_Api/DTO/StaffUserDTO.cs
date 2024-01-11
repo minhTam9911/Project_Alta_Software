@@ -6,7 +6,6 @@ namespace Project_2_Web_Api.DTO;
 
 public class StaffUserDTO
 {
-	public Guid Id { get; set; } = Guid.NewGuid();
 	[Required]
 	public string? Fullname { get; set; }
 	[Required]

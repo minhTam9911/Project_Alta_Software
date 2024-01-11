@@ -7,11 +7,11 @@ using Project_2_Web_Api.Service;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class UserController : ControllerBase
+public class StaffUserController : ControllerBase
 {
 /*	private readonly UserServiceAccessor _userServiceAccessor;*/
-	private readonly UserService userService;
-	public UserController(UserServiceAccessor userServiceAccessor, UserService userService)
+	private readonly StaffUserService userService;
+	public StaffUserController(UserServiceAccessor userServiceAccessor, StaffUserService userService)
 	{
 	//	_userServiceAccessor = userServiceAccessor;
 		this.userService = userService;
