@@ -185,7 +185,7 @@ public class AreaServiceImpl : AreaService
 					fullname = i.Fullname,
 					email = i.Email,
 					position = i.Position.Name,
-					isstatus = i.IsStatus==true? "Actived" : "Activated"
+					isstatus = i.IsStatus/*==true? "Activated" : "Not activated"*/
 				}).ToList(),
 				distributors = x.Distributors.Select(j => new
 				{
@@ -195,7 +195,7 @@ public class AreaServiceImpl : AreaService
 					address = j.Address,
 					phone = j.PhoneNumber,
 					position = j.Position.Name,
-					isstatus = j.IsStatus == true ? "Actived" : "Activated"
+					isstatus = j.IsStatus/* == true ? "Activated" : "Not activated"*/
 				})
 			}).ToListAsync();
 		}catch(Exception ex)
@@ -249,7 +249,7 @@ public class AreaServiceImpl : AreaService
 		try
 		{
 
-			if (await db.Areas.AnyAsync() == false || await db.Areas.FirstOrDefaultAsync(a => a.Name.ToLower().Contains(name.ToLower())) == null)
+			if (await db.Areas.AnyAsync() == false || await db.Areas.Where(a => a.Name.ToLower().Contains(name.ToLower())).AnyAsync() == false)
 			{
 				return new { msg = "Data is null !!!" };
 			}

@@ -1,11 +1,19 @@
 {
   "Version": 1,
-  "Hash": "vwbgZSKly0mbWyZFu9ie2mzzr0IyAON2tQANLdapzEI=",
+  "Hash": "9QLDYY4I4JkkLTsF91QLe8dHBWNUn8PYnnklIpO1NXE=",
   "Source": "Project_2_Web_Api",
   "BasePath": "_content/Project_2_Web_Api",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Project_2_Web_Api\\wwwroot",
+      "Source": "Project_2_Web_Api",
+      "ContentRoot": "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_API\\Project_2_Web_Api\\wwwroot\\",
+      "BasePath": "_content/Project_2_Web_Api",
+      "Pattern": "**"
+    }
+  ],
   "Assets": []
 }

@@ -178,7 +178,7 @@ public class GrantPermissionServiceImpl : GrantPermissionService
 	{
 		try
 		{
-			if (await db.GrantPermissions.AnyAsync() == false ||await db.GrantPermissions.FirstOrDefaultAsync(x => x.Permission.ToLower().Contains(name.ToLower())) == null)  
+			if (await db.GrantPermissions.AnyAsync() == false ||await db.GrantPermissions.Where(x => x.Permission.ToLower().Contains(name.ToLower())).AnyAsync() == false)  
 			{
 				 return new { msg = "Data is null !!!" }; ;
 			}

@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Mail;
 
-namespace PlantNestBackEnd.Helplers;
+namespace Project_2_Web_Api.Helplers;
 public class MailHelper
 {
     private IConfiguration configuration;

@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
 using Project_2_Web_API.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Net;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,14 +16,9 @@ public class AreaController : ControllerBase
 {
 	private readonly AreaService areaService;
 
-	public AreaController(AreaService areaService) {
-		this.areaService = areaService; 
-	}
-	
-	[HttpGet]
-	public IEnumerable<string> Get()
+	public AreaController(AreaService areaService)
 	{
-		return new string[] { "value1", "value2" };
+		this.areaService = areaService;
 	}
 
 	[Produces("application/json")]

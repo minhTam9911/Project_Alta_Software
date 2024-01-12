@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Project_2_Web_Api.Models;
 
 namespace Project_2_Web_API.Models;
 
@@ -22,5 +23,5 @@ public class DatabaseContext : DbContext
 	public DbSet<StaffUser> StaffUsers { get; set; }
 	public DbSet<TaskForVisit> TaskForVisit { get; set; }
 	public DbSet<Visit> Visits { get; set; }
-
+	public DbSet<ApiToken> ApiTokens { get; set; }
 }

@@ -22,6 +22,28 @@ namespace Project_2_Web_Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("Project_2_Web_Api.Models.ApiToken", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AccessToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("ApiTokens");
+                });
+
             modelBuilder.Entity("Project_2_Web_API.Models.Area", b =>
                 {
                     b.Property<int>("Id")
@@ -88,21 +110,15 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<int?>("AreaId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreateBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("CreatedDateToken")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ExpireDateToken")
-                        .HasColumnType("datetime2");
 
                     b.Property<bool?>("IsStatus")
                         .HasColumnType("bit");
@@ -131,13 +147,11 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<string>("SecurityCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TokenRefresh")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AreaId");
+
+                    b.HasIndex("CreateBy");
 
                     b.HasIndex("PositionId");
 
@@ -301,15 +315,9 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("CreatedDateToken")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ExpireDateToken")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Fullname")
                         .IsRequired()
@@ -330,10 +338,6 @@ namespace Project_2_Web_Api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SecurityCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TokenRefresh")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -404,21 +408,18 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreateBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("AreaId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("CreatedDateToken")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ExpireDateToken")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -441,11 +442,11 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<string>("SecurityCode")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TokenRefresh")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("AreaId");
+
+                    b.HasIndex("CreateBy");
 
                     b.HasIndex("PositionId");
 
@@ -541,6 +542,10 @@ namespace Project_2_Web_Api.Migrations
                         .WithMany("Distributors")
                         .HasForeignKey("AreaId");
 
+                    b.HasOne("Project_2_Web_API.Models.StaffUser", "StaffUser")
+                        .WithMany()
+                        .HasForeignKey("CreateBy");
+
                     b.HasOne("Project_2_Web_API.Models.Position", "Position")
                         .WithMany()
                         .HasForeignKey("PositionId")
@@ -560,6 +565,8 @@ namespace Project_2_Web_Api.Migrations
                     b.Navigation("SaleManagement");
 
                     b.Navigation("Sales");
+
+                    b.Navigation("StaffUser");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.GrantPermission", b =>
@@ -636,13 +643,25 @@ namespace Project_2_Web_Api.Migrations
 
             modelBuilder.Entity("Project_2_Web_API.Models.User", b =>
                 {
+                    b.HasOne("Project_2_Web_API.Models.Area", "Area")
+                        .WithMany()
+                        .HasForeignKey("AreaId");
+
+                    b.HasOne("Project_2_Web_API.Models.StaffUser", "StaffUser")
+                        .WithMany()
+                        .HasForeignKey("CreateBy");
+
                     b.HasOne("Project_2_Web_API.Models.Position", "Position")
                         .WithMany("Users")
                         .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Area");
+
                     b.Navigation("Position");
+
+                    b.Navigation("StaffUser");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.Visit", b =>

@@ -149,7 +149,8 @@ public class PositionGroupServiceImpl : PositionGroupService
 
 		try
 		{
-			if (await db.PositionGroups.AnyAsync() == false || await db.PositionGroups.FirstOrDefaultAsync(i => i.Name.ToLower().Contains(name.ToLower())) == null)
+			if (await db.PositionGroups.AnyAsync() == false 
+				|| await db.PositionGroups.Where(i => i.Name.ToLower().Contains(name.ToLower())).AnyAsync() == false)
 			{
 				return new { msg = "Data is null !!!" };
 			}

@@ -1,4 +1,4 @@
-﻿namespace PlantNestBackEnd.Helpers;
+﻿namespace Project_2_Web_Api.Helpers;
 
 public class FileHelper
 {

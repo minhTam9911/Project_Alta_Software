@@ -41,10 +41,12 @@ public class StaffUserController : ControllerBase
 		return await userService.Create(request);
 	}
 
-	// PUT api/<UserController>/5
-	[HttpPut("{id}")]
-	public void Put(int id, [FromBody] string value)
+	[Produces("application/json")]
+	[Consumes("application/json")]
+	[HttpPut("update/{id}")]
+	public async Task<IActionResult> Update(string id, [FromBody] StaffUserDTO request)
 	{
+		return await userService.Update(id,request);
 	}
 
 	// DELETE api/<UserController>/5

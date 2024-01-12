@@ -16,9 +16,6 @@ public partial class StaffUser
 	public string? PhoneNumber { get; set; }
 	public string? SecurityCode { get; set; }
 	public string? Address { get; set; }
-	public string TokenRefresh { get; set; } = null!;
-	public DateTime? CreatedDateToken { get; set; }
-	public DateTime? ExpireDateToken { get; set; }
 	public string? CreateBy { get; set; }
 	[Required]
 	public int? PositionId { get; set; }

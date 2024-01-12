@@ -44,6 +44,11 @@ public class StaffUserServiceImpl : StaffUserService
 				{
 					return new BadRequestObjectResult(new {error = "Email already exist!!"});
 				}
+
+				if (await db.Users.FirstOrDefaultAsync(x => x.Email == staffUser.Email) != null)
+				{
+					return new BadRequestObjectResult(new { error = "Email already exist!!" });
+				}
 				if (await db.Positions.FindAsync(staffUser.PositionId) == null)
 				{
 					return new BadRequestObjectResult(new { error = "Position not exist!!" });
@@ -54,7 +59,6 @@ public class StaffUserServiceImpl : StaffUserService
 					var hashPassword = BCrypt.Net.BCrypt.HashPassword(staffUser.Password);
 					staffUser.Password = hashPassword;
 					staffUser.IsStatus = false;
-					staffUser.TokenRefresh = "unactive";
 					db.StaffUsers.Add(staffUser);
 					if (await db.SaveChangesAsync() > 0)
 					{
@@ -73,7 +77,7 @@ public class StaffUserServiceImpl : StaffUserService
 		}
 	}
 
-	public async Task<IActionResult> Update(Guid id, StaffUserDTO staffUserDto)
+	public async Task<IActionResult> Update(string id, StaffUserDTO staffUserDto)
 	{
 		throw new NotImplementedException();
 	}
@@ -90,18 +94,19 @@ public class StaffUserServiceImpl : StaffUserService
 
 			if (await db.StaffUsers.ToListAsync() == null)
 			{
-				return new BadRequestObjectResult(new { error = "Data is null !!!" });
+				return new { error = "Data is null !!!" };
 			}
 			return await db.StaffUsers.Select(x => new
 			{
 				id = x.Id,
 				fullname = x.Fullname,
-				email = x.Email
+				email = x.Email,
+				area = x.Area.Name
 			}).ToListAsync();
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new { error = ex.Message };
 		}
 	}
 }

@@ -18,14 +18,14 @@ public partial class User
 	public string? Password { get; set; }
 	public bool? IsStatus{ get; set; }
 	public string? SecurityCode { get; set; }
-	public string TokenRefresh { get; set; } = null!;
-	public DateTime? CreatedDateToken { get; set; }
-	public DateTime? ExpireDateToken {  get; set; }	
-	public string? CreateBy {  get; set; }
+	public Guid? CreateBy {  get; set; }
 	[Required]
 	public int? PositionId { get; set; }
 	public DateTime CreatedDate {  get; set; }
 	[ForeignKey("PositionId")]
 	public virtual Position? Position { get; set; }
+	[ForeignKey("CreateBy")]
+	public virtual StaffUser? StaffUser { get; set; }
 	public virtual ICollection<GrantPermission> GrantPermissions { get; set; } = new List<GrantPermission>();
+	public virtual Area? Area { get; set; }
 }

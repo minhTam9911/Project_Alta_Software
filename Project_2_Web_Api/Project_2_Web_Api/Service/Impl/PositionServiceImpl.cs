@@ -191,7 +191,7 @@ public class PositionServiceImpl : PositionService
 	{
 		try
 		{
-			if (await db.Positions.AnyAsync() == false || await db.Positions.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(name.ToLower())) == null)
+			if (await db.Positions.AnyAsync() == false || await db.Positions.Where(x => x.Name.ToLower().Contains(name.ToLower())).AnyAsync() == false)
 			{
 				return new { msg = "Data is null !!!" };
 			}

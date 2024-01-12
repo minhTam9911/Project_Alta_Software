@@ -77,3 +77,4 @@ C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web
 C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web_Api\Project_2_Web_Api\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
 C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web_API\Project_2_Web_Api\bin\Debug\net6.0\AutoMapper.dll
 C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web_API\Project_2_Web_Api\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\minht\Documents\Inter Alta Software\Project_Alta_Software\Project_2_Web_API\Project_2_Web_Api\bin\Debug\net6.0\Project_2_Web_Api.staticwebassets.runtime.json
