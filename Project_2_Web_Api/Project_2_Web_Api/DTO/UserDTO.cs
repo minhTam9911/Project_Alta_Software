@@ -10,6 +10,7 @@ public class UserDTO
 	public string? PhoneNumber { get; set; }
 	public string? Address { get; set; }
 	[Required]
+	[EmailAddress]
 	public string? Email { get; set; }
 	public bool? IsStatus { get; set; }
 	[Required]

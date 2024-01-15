@@ -12,9 +12,12 @@ public class StaffUserDTO
 	[EmailAddress]
 	public string? Email { get; set; }
 	[Required]
-	public string? Password { get; set; }
-	public string? PhoneNumber { get; set; }
-	public string? Address { get; set; }
-	[Required]
 	public int? PositionId { get; set; }
+	[Required]
+	public string? StaffSuperior { get; set;}
+	[Required]
+	public string? StaffInterior { get; set; }
+	[Required]
+	public bool? IsStatus { get; set; }
+
 }

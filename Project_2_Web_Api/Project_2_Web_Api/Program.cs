@@ -22,7 +22,7 @@ builder.Services.AddScoped<AreaService,AreaServiceImpl>();
 builder.Services.AddScoped<StaffUserService, StaffUserServiceImpl>();
 builder.Services.AddScoped<UserServiceAccessor, UserServiceAccessorImpl>();
 builder.Services.AddScoped<UserService, UserServiceImpl>();
-
+builder.Services.AddScoped<SupportAccountService, SupportAccountServiceImpl>();
 /*builder.Services.AddAuthentication().AddJwtBearer(option =>
 {
 	option.TokenValidationParameters = new TokenValidationParameters

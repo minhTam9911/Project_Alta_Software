@@ -5,10 +5,11 @@ namespace Project_2_Web_Api.Service;
 
 public interface StaffUserService
 {
-	Task<dynamic> FindById(int id);
 	Task<IActionResult> Create(StaffUserDTO staffUserDto);
 	Task<IActionResult> Update(string id, StaffUserDTO staffUserDto);
 	Task<IActionResult> Delete(string id);
 	Task<dynamic> FindAll();
-
+	Task<dynamic> FindById(string id);
+	Task<dynamic> FindByName(string name);
+	Task<IActionResult> ResetPassword(string id);
 }
