@@ -17,6 +17,7 @@ public partial class StaffUser
 	public string? SecurityCode { get; set; }
 	public string? Address { get; set; }
 	public string? CreateBy { get; set; }
+	public string? PhotoAvatar { get; set; }
 	[Required]
 	public int? PositionId { get; set; }
 	public DateTime CreatedDate { get; set; }

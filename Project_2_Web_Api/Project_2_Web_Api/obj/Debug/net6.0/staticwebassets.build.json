@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "9QLDYY4I4JkkLTsF91QLe8dHBWNUn8PYnnklIpO1NXE=",
+  "Hash": "Xh4Gb3e/EE1xM3ypSpeF3vHElS0afbFhiSM5cPmxKW4=",
   "Source": "Project_2_Web_Api",
   "BasePath": "_content/Project_2_Web_Api",
   "Mode": "Default",
@@ -15,5 +15,23 @@
       "Pattern": "**"
     }
   ],
-  "Assets": []
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_API\\Project_2_Web_Api\\wwwroot\\Avatar\\avatar-default-icon.png",
+      "SourceId": "Project_2_Web_Api",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\minht\\Documents\\Inter Alta Software\\Project_Alta_Software\\Project_2_Web_API\\Project_2_Web_Api\\wwwroot\\",
+      "BasePath": "_content/Project_2_Web_Api",
+      "RelativePath": "Avatar/avatar-default-icon.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\Avatar\\avatar-default-icon.png"
+    }
+  ]
 }

@@ -14,9 +14,9 @@ public class StaffUserDTO
 	[Required]
 	public int? PositionId { get; set; }
 	[Required]
-	public string? StaffSuperior { get; set;}
+	public string[]? StaffSuperior { get; set;}
 	[Required]
-	public string? StaffInterior { get; set; }
+	public string[]? StaffInterior { get; set; }
 	[Required]
 	public bool? IsStatus { get; set; }
 

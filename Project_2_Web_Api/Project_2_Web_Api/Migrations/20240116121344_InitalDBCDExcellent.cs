@@ -14,8 +14,8 @@ namespace Project_2_Web_Api.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccessToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AccessToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -84,6 +84,7 @@ namespace Project_2_Web_Api.Migrations
                     SecurityCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhotoAvatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PositionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsStatus = table.Column<bool>(type: "bit", nullable: true),
@@ -120,6 +121,7 @@ namespace Project_2_Web_Api.Migrations
                     SalesId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsStatus = table.Column<bool>(type: "bit", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PhotoAvatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PositionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     AreaId = table.Column<int>(type: "int", nullable: true)
@@ -223,6 +225,7 @@ namespace Project_2_Web_Api.Migrations
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsStatus = table.Column<bool>(type: "bit", nullable: true),
                     SecurityCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhotoAvatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PositionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -317,11 +320,17 @@ namespace Project_2_Web_Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Module = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Permission = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DistributorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GrantPermissions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GrantPermissions_Distributors_DistributorId",
+                        column: x => x.DistributorId,
+                        principalTable: "Distributors",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_GrantPermissions_Users_UserId",
                         column: x => x.UserId,
@@ -407,6 +416,11 @@ namespace Project_2_Web_Api.Migrations
                 name: "IX_Distributors_SalesId",
                 table: "Distributors",
                 column: "SalesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GrantPermissions_DistributorId",
+                table: "GrantPermissions",
+                column: "DistributorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GrantPermissions_UserId",

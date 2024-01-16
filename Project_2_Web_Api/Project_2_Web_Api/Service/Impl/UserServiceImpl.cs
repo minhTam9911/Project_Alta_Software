@@ -60,9 +60,9 @@ public class UserServiceImpl : UserService
 				}
 				
 					user.CreatedDate = DateTime.Now;
-					var password = RandomHelper.RandomDefaultPassword(8);
+					var password = RandomHelper.RandomDefaultPassword(12);
 					var mailHelper = new MailHelper(configuration);
-
+				user.PhotoAvatar = "avatar-default-icon.png";
 					var content = "<h2>CDExcellent</h2><br><br>" +
 								"<h2>Hello " + user.FullName + "!</h2><br>" +
 							"<h3>CDExcellent is glad you signed up.</h3><br>" +
@@ -114,11 +114,15 @@ public class UserServiceImpl : UserService
 			}
 			else
 			{
-				if (await db.Users.FirstOrDefaultAsync(x => x.Email == userDTO.Email && x.Id != idUser) != null)
+				if (await db.Users.FirstOrDefaultAsync(x => x.Email == user.Email && x.Id != idUser) != null)
 				{
 					return new BadRequestObjectResult(new { error = "Email already exist!!" });
 				}
-				if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == userDTO.Email && x.Id != idUser) != null)
+				if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == user.Email) != null)
+				{
+					return new BadRequestObjectResult(new { error = "Email already exist!!" });
+				}
+				if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == user.Email) != null)
 				{
 					return new BadRequestObjectResult(new { error = "Email already exist!!" });
 				}
@@ -150,6 +154,7 @@ public class UserServiceImpl : UserService
 			return new BadRequestObjectResult(new { error = ex.Message });
 		}
 	}
+
 	public async Task<IActionResult> Delete(string id)
 	{
 		Guid idUser;
@@ -318,4 +323,52 @@ public class UserServiceImpl : UserService
 		}
 	}
 
+	public async Task<IActionResult> ResetPassword(string id)
+	{
+
+		try
+		{
+			Guid idUser;
+			bool parseGuid = Guid.TryParse(id, out idUser);
+			if (parseGuid == false)
+			{
+				return new BadRequestObjectResult(new { error = "Id User invalid !!" });
+			}
+			var user = await db.Users.FindAsync(idUser);
+			if (user == null)
+			{
+				return new BadRequestObjectResult(new { error = "Id User does not exist !!" });
+			}
+			var password = RandomHelper.RandomDefaultPassword(12);
+			var mailHelper = new MailHelper(configuration);
+			var content = "<h2>CDExcellent</h2><br><br>" +
+						"<h2>Hello " + user.FullName + "!</h2><br>" +
+					"<h3>CDExcellent is glad you signed up.</h3><br>" +
+					"<h2>=>Your account: " + user.Email + "</h2><br>" +
+					"<h2>=>Password: " + password + "</h2><br>" +
+					"<h3>This is only a temporary password, please log in and change it.</h3><br>" +
+					"<h2>Thank you very much!</h2>";
+			var check = mailHelper.Send(configuration["Gmail:Username"], user.Email, "Reset password account CDExcellent", content);
+			if (!check)
+			{
+				return new BadRequestObjectResult(new { error = "Email sending failed." });
+			}
+			var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
+			user.Password = hashPassword;
+			db.Entry(user).State = EntityState.Modified;
+			if (await db.SaveChangesAsync() > 0)
+			{
+				return new OkObjectResult(new { msg = "Reset password success !!" });
+			}
+			else
+			{
+				return new BadRequestObjectResult(new { error = "Reset password failure !!" });
+			}
+
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult(new { error = ex.Message });
+		}
+	}
 }

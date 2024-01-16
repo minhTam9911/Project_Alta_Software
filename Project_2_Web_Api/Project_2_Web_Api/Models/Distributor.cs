@@ -21,6 +21,7 @@ public partial class Distributor
 	public Guid? SalesId {  get; set; }
 	public bool? IsStatus { get; set; }
 	public Guid? CreateBy { get; set; }
+	public string? PhotoAvatar { get; set; }
 	[Required]
 	public int? PositionId { get; set; }
 	public DateTime CreatedDate { get; set; }
@@ -32,4 +33,6 @@ public partial class Distributor
 	public virtual StaffUser? SaleManagement { get; set; }
 	[ForeignKey("SalesId")]
 	public virtual StaffUser? Sales { get; set; }
+	public virtual Area? Area { get; set; }
+	public virtual ICollection<GrantPermission> GrantPermissions { get; set; } = new List<GrantPermission>();
 }

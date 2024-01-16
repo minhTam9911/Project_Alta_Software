@@ -29,14 +29,12 @@ namespace Project_2_Web_Api.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AccessToken")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool?>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<string>("RefreshToken")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("UserId");
@@ -134,6 +132,9 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PhotoAvatar")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("PositionId")
                         .IsRequired()
                         .HasColumnType("int");
@@ -170,6 +171,9 @@ namespace Project_2_Web_Api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<Guid?>("DistributorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Module")
                         .HasColumnType("nvarchar(max)");
 
@@ -180,6 +184,8 @@ namespace Project_2_Web_Api.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DistributorId");
 
                     b.HasIndex("UserId");
 
@@ -333,6 +339,9 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PhotoAvatar")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("PositionId")
                         .IsRequired()
                         .HasColumnType("int");
@@ -433,6 +442,9 @@ namespace Project_2_Web_Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhotoAvatar")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PositionId")
@@ -538,7 +550,7 @@ namespace Project_2_Web_Api.Migrations
 
             modelBuilder.Entity("Project_2_Web_API.Models.Distributor", b =>
                 {
-                    b.HasOne("Project_2_Web_API.Models.Area", null)
+                    b.HasOne("Project_2_Web_API.Models.Area", "Area")
                         .WithMany("Distributors")
                         .HasForeignKey("AreaId");
 
@@ -560,6 +572,8 @@ namespace Project_2_Web_Api.Migrations
                         .WithMany()
                         .HasForeignKey("SalesId");
 
+                    b.Navigation("Area");
+
                     b.Navigation("Position");
 
                     b.Navigation("SaleManagement");
@@ -571,6 +585,10 @@ namespace Project_2_Web_Api.Migrations
 
             modelBuilder.Entity("Project_2_Web_API.Models.GrantPermission", b =>
                 {
+                    b.HasOne("Project_2_Web_API.Models.Distributor", null)
+                        .WithMany("GrantPermissions")
+                        .HasForeignKey("DistributorId");
+
                     b.HasOne("Project_2_Web_API.Models.User", null)
                         .WithMany("GrantPermissions")
                         .HasForeignKey("UserId");
@@ -699,6 +717,11 @@ namespace Project_2_Web_Api.Migrations
                     b.Navigation("Distributors");
 
                     b.Navigation("StaffUsers");
+                });
+
+            modelBuilder.Entity("Project_2_Web_API.Models.Distributor", b =>
+                {
+                    b.Navigation("GrantPermissions");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.Position", b =>

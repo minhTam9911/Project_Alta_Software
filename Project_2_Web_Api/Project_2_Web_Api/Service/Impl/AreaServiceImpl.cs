@@ -132,7 +132,7 @@ public class AreaServiceImpl : AreaService
 		}
 	}
 
-	public Task<IActionResult> RemoveStaffInArea(int idArea, int idStaff)
+	public async Task<IActionResult> RemoveStaffInArea(int idArea, int idStaff)
 	{
 		throw new NotImplementedException();
 	}

@@ -7,12 +7,12 @@ using Project_2_Web_Api.Service;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class UserController : ControllerBase
+public class DistributorController : ControllerBase
 {
-	private readonly UserService userService;
-	public UserController(UserService userService)
+	private readonly DistributorService distributorService;
+	public DistributorController(DistributorService distributorService)
 	{
-		this.userService = userService;
+		this.distributorService = distributorService;
 	}
 	[Produces("application/json")]
 	[Consumes("application/json")]
@@ -21,8 +21,9 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			return Ok(await userService.FindAll());
-		}catch(Exception ex)
+			return Ok(await distributorService.FindAll());
+		}
+		catch (Exception ex)
 		{
 			return BadRequest(new { error = ex.Message });
 		}
@@ -35,7 +36,7 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			return Ok(await userService.FindById(id));
+			return Ok(await distributorService.FindById(id));
 		}
 		catch (Exception ex)
 		{
@@ -50,7 +51,7 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			return Ok(await userService.FindByName(name));
+			return Ok(await distributorService.FindByName(name));
 		}
 		catch (Exception ex)
 		{
@@ -61,17 +62,17 @@ public class UserController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPost("create")]
-	public async Task<IActionResult> Create([FromBody] UserDTO request)
+	public async Task<IActionResult> Create([FromBody] DistributorDTO request)
 	{
-		return await userService.Create(request);
+		return await distributorService.Create(request);
 	}
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("update/{id}")]
-	public async Task<IActionResult> Update(string id, [FromBody] UserDTO request)
+	public async Task<IActionResult> Update(string id, [FromBody] DistributorDTO request)
 	{
-		return await userService.Update(id, request);
+		return await distributorService.Update(id, request);
 	}
 
 	[Produces("application/json")]
@@ -79,7 +80,7 @@ public class UserController : ControllerBase
 	[HttpDelete("delete/{id}")]
 	public async Task<IActionResult> Delete(string id)
 	{
-		return await userService.Delete(id);
+		return await distributorService.Delete(id);
 	}
 	[Produces("application/json")]
 	[Consumes("application/json")]
@@ -88,7 +89,7 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			return await userService.SettingPermission(request.Id, request.PermissionId);
+			return await distributorService.SettingPermission(request.Id, request.PermissionId);
 		}
 		catch (Exception ex)
 		{
@@ -101,6 +102,6 @@ public class UserController : ControllerBase
 	[HttpPut("reset-password")]
 	public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
 	{
-		return await userService.ResetPassword(request.Id);
+		return await distributorService.ResetPassword(request.Id);
 	}
 }

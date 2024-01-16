@@ -21,6 +21,8 @@ public class AutoMapperProfile : Profile
 		CreateMap<StaffUserDTO, StaffUser>();
 		CreateMap<User, UserDTO>();
 		CreateMap<UserDTO, User>();
+		CreateMap<DistributorDTO, Distributor>();
+		CreateMap<Distributor, DistributorDTO>();
 	}
 
 }

@@ -18,6 +18,7 @@ public partial class User
 	public string? Password { get; set; }
 	public bool? IsStatus{ get; set; }
 	public string? SecurityCode { get; set; }
+	public string? PhotoAvatar { get; set; }
 	public Guid? CreateBy {  get; set; }
 	[Required]
 	public int? PositionId { get; set; }

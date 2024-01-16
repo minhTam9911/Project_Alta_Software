@@ -273,6 +273,7 @@ public class SupportAccountServiceImpl : SupportAccountService
 			return new BadRequestObjectResult(new { error = ex.Message });
 		}
 	}
+
 	public bool CheckEmail(string email)
 	{
 		bool valid = true;
