@@ -15,4 +15,6 @@ public class DistributorDTO
 	public string? SaleManagementId { get; set; }
 	public string? SalesId { get; set; }
 	public bool? IsStatus { get; set; }
+	[Required]
+	public int? PositionId { get; set; }
 }

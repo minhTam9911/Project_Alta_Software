@@ -82,7 +82,7 @@ public class StaffUserServiceImpl : StaffUserService
 				}
 				var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
 				staffUser.Password = hashPassword;
-				foreach(var staffSuperior in staffUserDTO.StaffSuperior)
+				foreach(var staffSuperior in staffUserDTO.StaffSuperiorId)
 				{
 					Guid idStaffSuperior;
 					bool parseGuid = Guid.TryParse(staffSuperior, out idStaffSuperior);
@@ -97,7 +97,7 @@ public class StaffUserServiceImpl : StaffUserService
 					}
 					staffUser.StaffSuperior.Add(dataSuperior);
 				}
-				foreach (var staffInterior in staffUserDTO.StaffInterior)
+				foreach (var staffInterior in staffUserDTO.StaffInteriorId)
 				{
 					Guid idStaffInterior;
 					bool parseGuid = Guid.TryParse(staffInterior, out idStaffInterior);
@@ -183,7 +183,7 @@ public class StaffUserServiceImpl : StaffUserService
 				data.Fullname = staffUser.Fullname;
 				data.Email = staffUser.Email;
 				data.PositionId = staffUser.PositionId;
-				foreach (var staffSuperior in staffUserDTO.StaffSuperior)
+				foreach (var staffSuperior in staffUserDTO.StaffSuperiorId)
 				{
 					Guid idStaffSuperior;
 					bool parseGuidStaff = Guid.TryParse(staffSuperior, out idStaffSuperior);
@@ -198,7 +198,7 @@ public class StaffUserServiceImpl : StaffUserService
 					}
 					data.StaffSuperior.Add(dataSuperior);
 				}
-				foreach (var staffInterior in staffUserDTO.StaffInterior)
+				foreach (var staffInterior in staffUserDTO.StaffInteriorId)
 				{
 					Guid idStaffInterior;
 					bool parseGuidStaff = Guid.TryParse(staffInterior, out idStaffInterior);
@@ -281,8 +281,11 @@ public class StaffUserServiceImpl : StaffUserService
 				email = x.Email,
 				positionId = x.PositionId,
 				positionName = x.Position.Name,
-				areaId = x.Area.Id,
-				areaName = x.Area.Name,
+				area = x.Area == null ? null : new
+				{
+					id =  x.Area.Id,
+					name = x.Area.Name
+				},
 				status = x.IsStatus,
 				createDate = x.CreatedDate,
 				phoneNumber = x.PhoneNumber,
@@ -295,14 +298,14 @@ public class StaffUserServiceImpl : StaffUserService
 					positionName= i.Position.Name
 
 				}),
-				staffInterior = x.StaffInterior.Select(j => new
+				staffInterior = x.StaffInterior.Any() == false? null :  (x.StaffInterior.Select(j => new
 				{
 					idStaffInterior = j.Id,
 					fullname = j.Fullname,
 					positionId = j.PositionId,
 					positionName = j.Position.Name
 
-				})
+				}))
 
 			}).ToListAsync();
 		}

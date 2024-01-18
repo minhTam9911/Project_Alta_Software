@@ -5,6 +5,7 @@ using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
 using Project_2_Web_API.Models;
 using System.Net;
+using System.Security.Claims;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -19,6 +20,12 @@ public class AreaController : ControllerBase
 	public AreaController(AreaService areaService)
 	{
 		this.areaService = areaService;
+	}
+
+	[HttpGet("demo")]
+	public IActionResult demo()
+	{
+		return Ok(Guid.NewGuid());
 	}
 
 	[Produces("application/json")]

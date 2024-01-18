@@ -24,6 +24,7 @@ builder.Services.AddScoped<UserServiceAccessor, UserServiceAccessorImpl>();
 builder.Services.AddScoped<UserService, UserServiceImpl>();
 builder.Services.AddScoped<SupportAccountService, SupportAccountServiceImpl>();
 builder.Services.AddScoped<DistributorService, DistributorServiceImpl>();
+builder.Services.AddScoped<AuthService,AuthServiceImpl>();
 /*builder.Services.AddAuthentication().AddJwtBearer(option =>
 {
 	option.TokenValidationParameters = new TokenValidationParameters
