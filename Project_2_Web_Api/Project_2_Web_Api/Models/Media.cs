@@ -12,7 +12,4 @@ public partial class Media
 	public string? FilePath { get; set; }
 	public Guid? CreateBy { get; set; }
 	public DateTime CreateDate { get; set; }
-
-	[ForeignKey(nameof(CreateBy))]
-	public virtual User? User { get; set; }
 }

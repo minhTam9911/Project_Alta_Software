@@ -27,6 +27,7 @@ public partial class StaffUser
 	public virtual Area? Area { get; set; }	
 	public virtual ICollection<StaffUser>? StaffSuperior { get; set; } = new List<StaffUser>();
 	public virtual ICollection<StaffUser>? StaffInterior { get; set; } = new List<StaffUser>();
+	public virtual ICollection<GrantPermission> GrantPermissions { get; set; } = new List<GrantPermission>();
 
 
 

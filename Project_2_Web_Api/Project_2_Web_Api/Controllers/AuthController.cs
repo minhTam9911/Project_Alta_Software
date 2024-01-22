@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Castle.Core.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
 
@@ -23,4 +24,19 @@ public class AuthController : ControllerBase
 		return await authService.Login(request);
 	}
 
+	[Produces("application/json")]
+	[Consumes("application/json")]
+	[HttpPost("refresh-token")]
+	public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
+	{
+
+		var result = await authService.RefreshTokenAsync(request);
+
+		if(result.IsNullOrEmpty())
+		{
+			return Unauthorized(new {error = "Please log in again!" });
+		}
+
+		return Ok(new { accessToken = result });
+	}
 }

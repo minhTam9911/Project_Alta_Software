@@ -21,6 +21,6 @@ public partial class Post
 	[Required]
 	public string? PathOfTheArticle { get; set; }
 	[ForeignKey(nameof(CreateBy))]		
-	public virtual User? User { get; set; }	
+	public virtual StaffUser? User { get; set; }	
 
 }

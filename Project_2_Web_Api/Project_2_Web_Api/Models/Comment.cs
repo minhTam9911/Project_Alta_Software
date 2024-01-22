@@ -19,9 +19,7 @@ public class Comment
 	public string Comment1 { get; set; } = null!;
 
 	public DateTime CreateDate { get; set; }
-
-	[ForeignKey("AccountId")]
-	public virtual User Account { get; set; } = null!;
-
+	[ForeignKey(nameof(TaskId))]
 	public virtual TaskForVisit Task { get; set; } = null!;
+
 }

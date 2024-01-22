@@ -14,9 +14,8 @@ namespace Project_2_Web_Api.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccessToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: true)
+                    Exipres = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -35,6 +34,21 @@ namespace Project_2_Web_Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Areas", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Medias",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Medias", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -158,6 +172,30 @@ namespace Project_2_Web_Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Posts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShortDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsStatus = table.Column<bool>(type: "bit", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PathOfTheArticle = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Posts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Posts_StaffUsers_CreateBy",
+                        column: x => x.CreateBy,
+                        principalTable: "StaffUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StaffUserStaffUser",
                 columns: table => new
                 {
@@ -192,7 +230,7 @@ namespace Project_2_Web_Api.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreateBy = table.Column<int>(type: "int", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -260,25 +298,28 @@ namespace Project_2_Web_Api.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Calendar = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Time = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DistributorId = table.Column<int>(type: "int", nullable: false),
-                    GuestOfVisit = table.Column<int>(type: "int", nullable: false),
-                    CreateBy = table.Column<int>(type: "int", nullable: true),
+                    DistributorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    GuestOfVisitId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PurposeOfVisit = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DistributorId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StaffUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Visits", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Visits_Distributors_DistributorId1",
-                        column: x => x.DistributorId1,
+                        name: "FK_Visits_Distributors_DistributorId",
+                        column: x => x.DistributorId,
                         principalTable: "Distributors",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Visits_StaffUsers_StaffUserId",
-                        column: x => x.StaffUserId,
+                        name: "FK_Visits_StaffUsers_CreateBy",
+                        column: x => x.CreateBy,
+                        principalTable: "StaffUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Visits_StaffUsers_GuestOfVisitId",
+                        column: x => x.GuestOfVisitId,
                         principalTable: "StaffUsers",
                         principalColumn: "Id");
                 });
@@ -290,7 +331,7 @@ namespace Project_2_Web_Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TaskId = table.Column<int>(type: "int", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ParentCommentId = table.Column<int>(type: "int", nullable: true),
                     Comment1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -304,12 +345,6 @@ namespace Project_2_Web_Api.Migrations
                         principalTable: "TaskForVisit",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Comments_Users_AccountId",
-                        column: x => x.AccountId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -321,6 +356,7 @@ namespace Project_2_Web_Api.Migrations
                     Module = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Permission = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DistributorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StaffUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
@@ -332,60 +368,16 @@ namespace Project_2_Web_Api.Migrations
                         principalTable: "Distributors",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_GrantPermissions_StaffUsers_StaffUserId",
+                        column: x => x.StaffUserId,
+                        principalTable: "StaffUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_GrantPermissions_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
-
-            migrationBuilder.CreateTable(
-                name: "Medias",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Medias", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Medias_Users_CreateBy",
-                        column: x => x.CreateBy,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Posts",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShortDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsStatus = table.Column<bool>(type: "bit", nullable: false),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PathOfTheArticle = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Posts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Posts_Users_CreateBy",
-                        column: x => x.CreateBy,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Comments_AccountId",
-                table: "Comments",
-                column: "AccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_TaskId",
@@ -423,14 +415,14 @@ namespace Project_2_Web_Api.Migrations
                 column: "DistributorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GrantPermissions_StaffUserId",
+                table: "GrantPermissions",
+                column: "StaffUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_GrantPermissions_UserId",
                 table: "GrantPermissions",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Medias_CreateBy",
-                table: "Medias",
-                column: "CreateBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Positions_PositionGroupId",
@@ -483,14 +475,19 @@ namespace Project_2_Web_Api.Migrations
                 column: "PositionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Visits_DistributorId1",
+                name: "IX_Visits_CreateBy",
                 table: "Visits",
-                column: "DistributorId1");
+                column: "CreateBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Visits_StaffUserId",
+                name: "IX_Visits_DistributorId",
                 table: "Visits",
-                column: "StaffUserId");
+                column: "DistributorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Visits_GuestOfVisitId",
+                table: "Visits",
+                column: "GuestOfVisitId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

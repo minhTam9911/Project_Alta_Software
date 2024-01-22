@@ -1,6 +1,7 @@
 ﻿
 
 using AutoMapper;
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using Newtonsoft.Json;
 using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Helplers;
 using Project_2_Web_API.Models;
+using System.Security.Claims;
 
 namespace Project_2_Web_Api.Service.Impl;
 
@@ -59,11 +61,7 @@ public class StaffUserServiceImpl : StaffUserService
 				{
 					return new BadRequestObjectResult(new { error = "Position option is invalid. Do not select Guest or Other Department" });
 				}
-				if (checkPosition.Name.ToLower() == "administrator" || checkPosition.Name == "owner")
-				{
-					return new BadRequestObjectResult(new { error = "Position option is invalid. You are not authorized to create an account with this position" });
-				}
-
+				staffUser.CreateBy = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
 				staffUser.CreatedDate = DateTime.Now;
 				var password = RandomHelper.RandomDefaultPassword(12);
 				var mailHelper = new MailHelper(configuration);
@@ -75,43 +73,53 @@ public class StaffUserServiceImpl : StaffUserService
 							"<h2>=>Password: " + password + "</h2><br>" +
 							"<h3>This is only a temporary password, please log in and change it.</h3><br>" +
 							"<h2>Thank you very much!</h2>";
-				var check = mailHelper.Send(configuration["Gmail:Username"], staffUser.Email, "Welcome " + staffUser.Fullname + "to join CDExcellent", content);
+				var check = mailHelper.Send(configuration["Gmail:Username"], staffUser.Email, "Welcome " + staffUser.Fullname + " to join CDExcellent", content);
 				if (!check)
 				{
 					return new BadRequestObjectResult(new { error = "Email sending failed." });
 				}
 				var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
 				staffUser.Password = hashPassword;
-				foreach(var staffSuperior in staffUserDTO.StaffSuperiorId)
+				if(staffUser.PositionId != 1 && staffUser.PositionId != 2)
 				{
-					Guid idStaffSuperior;
-					bool parseGuid = Guid.TryParse(staffSuperior, out idStaffSuperior);
-					if (parseGuid == false)
+					foreach (var staffSuperior in staffUserDTO.StaffSuperiorId)
 					{
-						return new BadRequestObjectResult(new { error = "Id Staff Superior invalid !!" });
+						Guid idStaffSuperior;
+						bool parseGuid = Guid.TryParse(staffSuperior, out idStaffSuperior);
+						if (parseGuid == false)
+						{
+							return new BadRequestObjectResult(new { error = "Id Staff Superior invalid !!" });
+						}
+						var dataSuperior = await db.StaffUsers.FindAsync(idStaffSuperior);
+						if (dataSuperior == null)
+						{
+							return new BadRequestObjectResult(new { error = "Id Staff Superior not exist !!" });
+						}
+						staffUser.StaffSuperior.Add(dataSuperior);
 					}
-					var dataSuperior = await db.StaffUsers.FindAsync(idStaffSuperior);
-					if(dataSuperior == null)
+
+					foreach (var staffInterior in staffUserDTO.StaffInteriorId)
 					{
-						return new BadRequestObjectResult(new { error = "Id Staff Superior not exist !!" });
+						if (!staffInterior.IsNullOrEmpty())
+						{
+							Guid idStaffInterior;
+							bool parseGuid = Guid.TryParse(staffInterior, out idStaffInterior);
+							if (parseGuid == false)
+							{
+								return new BadRequestObjectResult(new { error = "Id Staff Interior invalid !!" });
+							}
+							var dataInterior = await db.StaffUsers.FindAsync(idStaffInterior);
+							if (dataInterior == null)
+							{
+								return new BadRequestObjectResult(new { error = "Id Staff Interior not exist !!" });
+							}
+							staffUser.StaffInterior.Add(dataInterior);
+						}
+
 					}
-					staffUser.StaffSuperior.Add(dataSuperior);
+
 				}
-				foreach (var staffInterior in staffUserDTO.StaffInteriorId)
-				{
-					Guid idStaffInterior;
-					bool parseGuid = Guid.TryParse(staffInterior, out idStaffInterior);
-					if (parseGuid == false)
-					{
-						return new BadRequestObjectResult(new { error = "Id Staff Interior invalid !!" });
-					}
-					var dataInterior = await db.StaffUsers.FindAsync(idStaffInterior);
-					if (dataInterior == null)
-					{
-						return new BadRequestObjectResult(new { error = "Id Staff Interior not exist !!" });
-					}
-					staffUser.StaffInterior.Add(dataInterior);
-				}
+
 				staffUser.PhotoAvatar = "avatar-default-icon.png";
 				db.StaffUsers.Add(staffUser);
 				if (await db.SaveChangesAsync() > 0)
@@ -142,7 +150,7 @@ public class StaffUserServiceImpl : StaffUserService
 		{
 			if (parseGuid == false)
 			{
-			return new BadRequestObjectResult(new { error = "Id Staff Interior invalid !!" });
+			return new BadRequestObjectResult(new { error = "Id Staff invalid !!" });
 			}
 			if (modelState != null && !modelState.IsValid)
 			{
@@ -152,21 +160,21 @@ public class StaffUserServiceImpl : StaffUserService
 			{
 				if (await db.Users.FirstOrDefaultAsync(x => x.Email == staffUser.Email) != null)
 				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					return new BadRequestObjectResult(new { error = "Email already exist!1!" });
 				}
 				if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == staffUser.Email && x.Id != idStaffUser) != null)
 				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					return new BadRequestObjectResult(new { error = "Email already exist!2!" });
 				}
 				if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == staffUser.Email) != null)
 				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					return new BadRequestObjectResult(new { error = "Email already exist!3!" });
 				}
 				if (await db.Positions.FindAsync(staffUser.PositionId) == null)
 				{
 					return new BadRequestObjectResult(new { error = "Position not exist!!" });
 				}
-				if(await db.StaffUsers.FindAsync(idStaffUser) != null)
+				if(await db.StaffUsers.FindAsync(idStaffUser) == null)
 				{
 					return new BadRequestObjectResult(new { error = "Id Staff not exist!!" });
 				}
@@ -175,14 +183,11 @@ public class StaffUserServiceImpl : StaffUserService
 				{
 					return new BadRequestObjectResult(new { error = "Position option is invalid. Do not select Guest or Other Department" });
 				}
-				if (checkPosition.Name.ToLower() == "administrator" || checkPosition.Name == "owner")
-				{
-					return new BadRequestObjectResult(new { error = "Position option is invalid. You are not authorized to create an account with this position" });
-				}
 				var data = await db.StaffUsers.FindAsync(idStaffUser);
 				data.Fullname = staffUser.Fullname;
 				data.Email = staffUser.Email;
 				data.PositionId = staffUser.PositionId;
+				data.StaffSuperior.Clear();
 				foreach (var staffSuperior in staffUserDTO.StaffSuperiorId)
 				{
 					Guid idStaffSuperior;
@@ -198,29 +203,34 @@ public class StaffUserServiceImpl : StaffUserService
 					}
 					data.StaffSuperior.Add(dataSuperior);
 				}
+				data.StaffInterior.Clear();
+				
 				foreach (var staffInterior in staffUserDTO.StaffInteriorId)
 				{
-					Guid idStaffInterior;
-					bool parseGuidStaff = Guid.TryParse(staffInterior, out idStaffInterior);
-					if (parseGuidStaff == false)
+					if (!staffInterior.IsNullOrEmpty())
 					{
-						return new BadRequestObjectResult(new { error = "Id Staff Interior invalid !!" });
+						Guid idStaffInterior;
+						bool parseGuidStaff = Guid.TryParse(staffInterior, out idStaffInterior);
+						if (parseGuidStaff == false)
+						{
+							return new BadRequestObjectResult(new { error = "Id Staff Interior invalid !!" });
+						}
+						var dataInterior = await db.StaffUsers.FindAsync(idStaffInterior);
+						if (dataInterior == null)
+						{
+							return new BadRequestObjectResult(new { error = "Id Staff Interior not exist !!" });
+						}
+						data.StaffInterior.Add(dataInterior);
 					}
-					var dataInterior = await db.StaffUsers.FindAsync(idStaffInterior);
-					if (dataInterior == null)
-					{
-						return new BadRequestObjectResult(new { error = "Id Staff Interior not exist !!" });
-					}
-					data.StaffInterior.Add(dataInterior);
 				}
 				db.Entry(data).State = EntityState.Modified;
 				if (await db.SaveChangesAsync() > 0)
 				{
-					return new OkObjectResult(new { msg = "Added successfully !!" });
+					return new OkObjectResult(new { msg = "Update successfully !!" });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Added failure !!" });
+					return new BadRequestObjectResult(new { error = "Update failure !!" });
 				}
 
 			}
@@ -241,13 +251,23 @@ public class StaffUserServiceImpl : StaffUserService
 			{
 				return new BadRequestObjectResult(new { error = "Id User invalid !!" });
 			}
-			if (await db.StaffUsers.FindAsync(idStaff) == null)
+			var data = await db.StaffUsers.FindAsync(idStaff);
+			if (data  == null)
 			{
 				return new BadRequestObjectResult(new { error = "Id does not exist!" });
 			}
+			if (data.Position.Name.ToLower() == "administrator" || data.Position.Name.ToLower() == "owner")
+			{
+				return new BadRequestObjectResult(new { error = "This is a high-level account and cannot be deleted" });
+			}
 			else
 			{
-				db.StaffUsers.Remove(await db.StaffUsers.FindAsync(idStaff));
+				data.StaffInterior.Clear();
+				data.StaffSuperior.Clear();
+				data.Area = null;
+				db.Entry(data).State = EntityState.Modified;
+				await db.SaveChangesAsync();
+				db.StaffUsers.Remove(data);
 				var check = await db.SaveChangesAsync();
 				if (check > 0)
 				{
@@ -281,9 +301,11 @@ public class StaffUserServiceImpl : StaffUserService
 				email = x.Email,
 				positionId = x.PositionId,
 				positionName = x.Position.Name,
+				createBy = x.CreateBy,
 				area = x.Area == null ? null : new
 				{
 					id =  x.Area.Id,
+					code= x.Area.Code,
 					name = x.Area.Name
 				},
 				status = x.IsStatus,
@@ -336,8 +358,13 @@ public class StaffUserServiceImpl : StaffUserService
 				email = x.Email,
 				positionId = x.PositionId,
 				positionName = x.Position.Name,
-				areaId = x.Area.Id,
-				areaName = x.Area.Name,
+				createBy = x.CreateBy,
+				area = x.Area == null ? null : new
+				{
+					id = x.Area.Id,
+					code = x.Area.Code,
+					name = x.Area.Name
+				},
 				status = x.IsStatus,
 				createDate = x.CreatedDate,
 				phoneNumber = x.PhoneNumber,
@@ -350,14 +377,14 @@ public class StaffUserServiceImpl : StaffUserService
 					positionName = i.Position.Name
 
 				}),
-				staffInterior = x.StaffInterior.Select(j => new
+				staffInterior = x.StaffInterior.Any() == false ? null : (x.StaffInterior.Select(j => new
 				{
 					idStaffInterior = j.Id,
 					fullname = j.Fullname,
 					positionId = j.PositionId,
 					positionName = j.Position.Name
 
-				})
+				}))
 
 			}).FirstOrDefaultAsync();
 		}
@@ -384,8 +411,12 @@ public class StaffUserServiceImpl : StaffUserService
 				email = x.Email,
 				positionId = x.PositionId,
 				positionName = x.Position.Name,
-				areaId = x.Area.Id,
-				areaName = x.Area.Name,
+				area = x.Area == null ? null : new
+				{
+					id = x.Area.Id,
+					code = x.Area.Code,
+					name = x.Area.Name
+				},
 				status = x.IsStatus,
 				createDate = x.CreatedDate,
 				phoneNumber = x.PhoneNumber,
@@ -398,14 +429,14 @@ public class StaffUserServiceImpl : StaffUserService
 					positionName = i.Position.Name
 
 				}),
-				staffInterior = x.StaffInterior.Select(j => new
+				staffInterior = x.StaffInterior.Any() == false ? null : (x.StaffInterior.Select(j => new
 				{
 					idStaffInterior = j.Id,
 					fullname = j.Fullname,
 					positionId = j.PositionId,
 					positionName = j.Position.Name
 
-				})
+				}))
 
 			}).ToListAsync();
 		}
@@ -463,4 +494,46 @@ public class StaffUserServiceImpl : StaffUserService
 			return new BadRequestObjectResult(new { error = ex.Message });
 		}
 	}
+
+	public async Task<IActionResult> SettingPermission(string id, int[] permissions)
+	{
+		Guid idUser;
+		bool parseGuid = Guid.TryParse(id, out idUser);
+		try
+		{
+			if (parseGuid == false)
+			{
+				return new BadRequestObjectResult(new { error = "Id Staff invalid !!" });
+			}
+			var data = await db.StaffUsers.FindAsync(idUser);
+			if (data == null)
+			{
+				return new BadRequestObjectResult(new { error = "Id Staff does not exist !!" });
+			}
+			var permissionDB = await db.GrantPermissions.ToListAsync();
+			foreach (var permision in permissions)
+			{
+				if (permissionDB.Any(x => x.Id == permision))
+				{
+					data.GrantPermissions.Add(await db.GrantPermissions.FindAsync(permision));
+					db.Entry(data).State = EntityState.Modified;
+					if (await db.SaveChangesAsync() > 0) ;
+					else
+					{
+						return new BadRequestObjectResult(new { error = "The system encountered a problem !!" });
+					}
+				}
+				else
+				{
+					return new BadRequestObjectResult(new { error = "ID Permission does not exist !!" });
+				}
+			}
+			return new OkObjectResult(new { msg = "Add permissions to user successfully" });
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult(new { error = ex.Message });
+		}
+	}
+
 }

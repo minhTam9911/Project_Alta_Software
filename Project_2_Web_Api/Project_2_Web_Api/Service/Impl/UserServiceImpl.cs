@@ -7,6 +7,7 @@ using Project_2_Web_Api.Helplers;
 using Project_2_Web_API.Models;
 using System.Net.Mail;
 using System;
+using System.Security.Claims;
 
 namespace Project_2_Web_Api.Service.Impl;
 
@@ -56,11 +57,11 @@ public class UserServiceImpl : UserService
 					return new BadRequestObjectResult(new { error = "Position not exist!!" });
 				}
 				var checkPosition = await db.Positions.FindAsync(user.PositionId);
-				if(checkPosition.Name.ToLower() != "guest" && checkPosition.Name != "other department")
+				if(checkPosition.Name.ToLower() != "guest" && checkPosition.Name.ToLower() != "other department")
 				{
 					return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Guest' or 'Other Department'" });
 				}
-				
+				user.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
 					user.CreatedDate = DateTime.Now;
 					var password = RandomHelper.RandomDefaultPassword(12);
 					var mailHelper = new MailHelper(configuration);
@@ -72,7 +73,7 @@ public class UserServiceImpl : UserService
 							"<h2>=>Password: " + password + "</h2><br>" +
 							"<h3>This is only a temporary password, please log in and change it.</h3><br>" +
 							"<h2>Thank you very much!</h2>";
-				var check = mailHelper.Send(configuration["Gmail:Username"],user.Email,"Welcome "+user.FullName+ "to join CDExcellent", content);
+				var check = mailHelper.Send(configuration["Gmail:Username"],user.Email,"Welcome "+user.FullName+ " to join CDExcellent", content);
 					if (!check)
 					{
 						return new BadRequestObjectResult(new { error = "Email sending failed." });
@@ -167,12 +168,18 @@ public class UserServiceImpl : UserService
 			{
 				return new BadRequestObjectResult(new { error = "Id User invalid !!" });
 			}
-			if (await db.Users.FindAsync(idUser) == null)
+			var data = await db.Users.FindAsync(idUser);
+			if (data == null)
 			{
 				return new BadRequestObjectResult(new { error = "Id does not exist!" });
 			}
 			else
 			{
+				data.Area = null;
+				data.GrantPermissions.Clear();
+				db.Entry(data).State = EntityState.Modified;
+				await db.SaveChangesAsync();
+
 				db.Users.Remove(await db.Users.FindAsync(idUser));
 				var check = await db.SaveChangesAsync();
 				if (check > 0)
@@ -207,9 +214,18 @@ public class UserServiceImpl : UserService
 				email = x.Email,
 				positionId = x.PositionId,
 				positionName = x.Position.Name,
-				areaId = x.Area.Id,
-				areaName=x.Area.Name,
+				area = x.Area == null? null : new
+				{
+					id = x.Area.Id,
+					name = x.Area.Name
+				},
 				status = x.IsStatus,
+				grantPermissions = x.GrantPermissions == null? null:x.GrantPermissions.Select(i=>new
+				{
+					id = i.Id,
+					module = i.Module,
+					permission = i.Permission
+				}),
 				createBy = x.StaffUser.Fullname
 				
 			}).ToListAsync();

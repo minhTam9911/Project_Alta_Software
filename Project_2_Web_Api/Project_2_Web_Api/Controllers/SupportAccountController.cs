@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
 
@@ -18,6 +19,7 @@ public class SupportAccountController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("change-password")]
+	[Authorize]
 	public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
 	{
 		string? id = User?.Identity.Name;
@@ -29,6 +31,10 @@ public class SupportAccountController : ControllerBase
 	[HttpPut("forgot-password")]
 	public async Task<IActionResult> ForgotPassword([FromBody] VerifyCode request)
 	{
+		if (User?.Identity.Name != null)
+		{
+			return Unauthorized();
+		}
 		return await supportAccountService.ForgotPassword(request.email);
 	}
 
@@ -37,6 +43,10 @@ public class SupportAccountController : ControllerBase
 	[HttpPut("verify-code")]
 	public async Task<IActionResult> VerifyCode([FromBody] VerifyCode request)
 	{
+		if (User?.Identity.Name != null)
+		{
+			return Unauthorized();
+		}
 		return await supportAccountService.VerifySecurityCode(request.email, request.code);
 	}
 
@@ -45,6 +55,10 @@ public class SupportAccountController : ControllerBase
 	[HttpPut("change-forgot-password")]
 	public async Task<IActionResult> ChangeForgotPassword([FromBody] ChangePasswordRequest request)
 	{
+		if (User?.Identity.Name != null)
+		{
+			return Unauthorized();
+		}
 		return await supportAccountService.ChangeForgotPassword(request.email, request.newPassword);
 	}
 

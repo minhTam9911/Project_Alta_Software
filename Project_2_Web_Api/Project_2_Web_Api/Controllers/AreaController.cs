@@ -13,20 +13,29 @@ using System.Security.Claims;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class AreaController : ControllerBase
 {
 	private readonly AreaService areaService;
-
-	public AreaController(AreaService areaService)
+	private readonly UserServiceAccessor userServiceAccessor;
+	public AreaController(AreaService areaService, UserServiceAccessor userServiceAccessor)
 	{
 		this.areaService = areaService;
+		this.userServiceAccessor = userServiceAccessor;
 	}
 
-	[HttpGet("demo")]
+
+	#region
+	/*[HttpGet("demo")]
+	[Authorize]
 	public IActionResult demo()
 	{
-		return Ok(Guid.NewGuid());
-	}
+		return Ok(new { id = Guid.NewGuid(), password = BCrypt.Net.BCrypt.HashPassword("abc123"), date = DateTime.Now, token = User?.Identity.Name });
+	}*/
+	#endregion
+
+
+
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
@@ -35,6 +44,18 @@ public class AreaController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await areaService.FindAll());
 		}catch(Exception ex)
 		{
@@ -49,6 +70,18 @@ public class AreaController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await areaService.FindById(id));
 		}
 		catch (Exception ex)
@@ -64,6 +97,18 @@ public class AreaController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await areaService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -77,6 +122,18 @@ public class AreaController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody] AreaDTO request)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await areaService.Create(request);
 	}
 
@@ -85,7 +142,76 @@ public class AreaController : ControllerBase
 	[HttpPut("add-staff-to-area/{idArea}")]
 	public async Task<IActionResult> AddStaffToArea(int idArea, [FromQuery(Name = "id-staff")] string idStaff )
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await areaService.AddStaffToArea(idArea,idStaff);
+	}
+	[Produces("application/json")]
+	[Consumes("application/json")]
+	[HttpPut("remove-staff-in-area/{idArea}")]
+	public async Task<IActionResult> RemoveStaffInArea(int idArea, [FromQuery(Name = "id-staff")] string idStaff)
+	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
+		return await areaService.RemoveStaffInArea(idArea, idStaff);
+	}
+	[Produces("application/json")]
+	[Consumes("application/json")]
+	[HttpPut("add-distributor-to-area/{idArea}")]
+	public async Task<IActionResult> AddDistributorToArea(int idArea, [FromQuery(Name = "id-ditributor")] string idDistributor)
+	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
+		return await areaService.AddDistributorToArea(idArea, idDistributor);
+	}
+	[Produces("application/json")]
+	[Consumes("application/json")]
+	[HttpPut("remove-distributor-in-area/{idArea}")]
+	public async Task<IActionResult> RemoveDistributorInArea(int idArea, [FromQuery(Name = "id-ditributor")] string idDistributor)
+	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if(await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
+		return await areaService.RemoveDistributorInArea(idArea, idDistributor);
 	}
 
 	[Produces("application/json")]
@@ -93,6 +219,18 @@ public class AreaController : ControllerBase
 	[HttpPut("update/{id}")]
 	public async Task<IActionResult> Update(int id, [FromQuery(Name = "name-area")] string nameArea)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await areaService.Update(id, nameArea);
 	}
 
@@ -101,6 +239,18 @@ public class AreaController : ControllerBase
 	[HttpDelete("delete/{id}")]
 	public async Task<IActionResult> Delete(int id)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await areaService.Delete(id);
 	}
 }

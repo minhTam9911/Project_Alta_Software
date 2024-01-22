@@ -125,7 +125,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 
 		try
 		{
-			if (await db.PositionGroups.AnyAsync() == false || await db.PositionGroups.FindAsync(id) == null)
+			if (await db.PositionGroups.AnyAsync() == false || await db.PositionGroups.FindAsync(Int32.Parse(id)) == null)
 			{
 				return new { msg = "Data is null !!!" };
 			}

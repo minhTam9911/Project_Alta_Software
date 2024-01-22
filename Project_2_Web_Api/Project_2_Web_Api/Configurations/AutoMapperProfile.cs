@@ -23,6 +23,10 @@ public class AutoMapperProfile : Profile
 		CreateMap<UserDTO, User>();
 		CreateMap<DistributorDTO, Distributor>();
 		CreateMap<Distributor, DistributorDTO>();
+		CreateMap<VisitDTO, Visit>();
+		CreateMap<Visit, VisitDTO>();
+		CreateMap<TaskForVisitDTO, TaskForVisit>();
+		CreateMap<TaskForVisit, TaskForVisitDTO>();
 	}
 
 }

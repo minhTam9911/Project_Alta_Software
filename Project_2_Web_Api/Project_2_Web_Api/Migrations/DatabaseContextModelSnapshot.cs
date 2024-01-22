@@ -28,11 +28,8 @@ namespace Project_2_Web_Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AccessToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("IsActive")
-                        .HasColumnType("bit");
+                    b.Property<DateTime?>("Exipres")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("RefreshToken")
                         .HasColumnType("nvarchar(max)");
@@ -70,7 +67,6 @@ namespace Project_2_Web_Api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<Guid?>("AccountId")
-                        .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comment1")
@@ -87,8 +83,6 @@ namespace Project_2_Web_Api.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
 
                     b.HasIndex("TaskId");
 
@@ -180,12 +174,17 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<string>("Permission")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("StaffUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DistributorId");
+
+                    b.HasIndex("StaffUserId");
 
                     b.HasIndex("UserId");
 
@@ -211,8 +210,6 @@ namespace Project_2_Web_Api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreateBy");
 
                     b.ToTable("Medias");
                 });
@@ -370,8 +367,8 @@ namespace Project_2_Web_Api.Migrations
                         .IsRequired()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("CreateBy")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -477,26 +474,18 @@ namespace Project_2_Web_Api.Migrations
                         .IsRequired()
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("CreateBy")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DistributorId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("DistributorId1")
+                    b.Property<Guid?>("CreateBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("GuestOfVisit")
-                        .IsRequired()
-                        .HasColumnType("int");
+                    b.Property<Guid?>("DistributorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("GuestOfVisitId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("PurposeOfVisit")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("StaffUserId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -507,9 +496,11 @@ namespace Project_2_Web_Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DistributorId1");
+                    b.HasIndex("CreateBy");
 
-                    b.HasIndex("StaffUserId");
+                    b.HasIndex("DistributorId");
+
+                    b.HasIndex("GuestOfVisitId");
 
                     b.ToTable("Visits");
                 });
@@ -531,19 +522,11 @@ namespace Project_2_Web_Api.Migrations
 
             modelBuilder.Entity("Project_2_Web_API.Models.Comment", b =>
                 {
-                    b.HasOne("Project_2_Web_API.Models.User", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Project_2_Web_API.Models.TaskForVisit", "Task")
                         .WithMany("Comments")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Account");
 
                     b.Navigation("Task");
                 });
@@ -589,18 +572,13 @@ namespace Project_2_Web_Api.Migrations
                         .WithMany("GrantPermissions")
                         .HasForeignKey("DistributorId");
 
+                    b.HasOne("Project_2_Web_API.Models.StaffUser", null)
+                        .WithMany("GrantPermissions")
+                        .HasForeignKey("StaffUserId");
+
                     b.HasOne("Project_2_Web_API.Models.User", null)
                         .WithMany("GrantPermissions")
                         .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Project_2_Web_API.Models.Media", b =>
-                {
-                    b.HasOne("Project_2_Web_API.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("CreateBy");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.Position", b =>
@@ -616,7 +594,7 @@ namespace Project_2_Web_Api.Migrations
 
             modelBuilder.Entity("Project_2_Web_API.Models.Post", b =>
                 {
-                    b.HasOne("Project_2_Web_API.Models.User", "User")
+                    b.HasOne("Project_2_Web_API.Models.StaffUser", "User")
                         .WithMany()
                         .HasForeignKey("CreateBy");
 
@@ -684,15 +662,21 @@ namespace Project_2_Web_Api.Migrations
 
             modelBuilder.Entity("Project_2_Web_API.Models.Visit", b =>
                 {
-                    b.HasOne("Project_2_Web_API.Models.Distributor", "Distributor")
-                        .WithMany()
-                        .HasForeignKey("DistributorId1");
-
                     b.HasOne("Project_2_Web_API.Models.StaffUser", "StaffUser")
                         .WithMany()
-                        .HasForeignKey("StaffUserId");
+                        .HasForeignKey("CreateBy");
+
+                    b.HasOne("Project_2_Web_API.Models.Distributor", "Distributor")
+                        .WithMany()
+                        .HasForeignKey("DistributorId");
+
+                    b.HasOne("Project_2_Web_API.Models.StaffUser", "GuestOfVisit")
+                        .WithMany()
+                        .HasForeignKey("GuestOfVisitId");
 
                     b.Navigation("Distributor");
+
+                    b.Navigation("GuestOfVisit");
 
                     b.Navigation("StaffUser");
                 });
@@ -732,6 +716,11 @@ namespace Project_2_Web_Api.Migrations
             modelBuilder.Entity("Project_2_Web_API.Models.PositionGroup", b =>
                 {
                     b.Navigation("Positions");
+                });
+
+            modelBuilder.Entity("Project_2_Web_API.Models.StaffUser", b =>
+                {
+                    b.Navigation("GrantPermissions");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.TaskForVisit", b =>

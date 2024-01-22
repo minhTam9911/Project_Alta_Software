@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
 using Project_2_Web_API.Models;
@@ -8,13 +9,16 @@ using Project_2_Web_API.Models;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class PositionController : ControllerBase
 {
 
 	private readonly PositionService positionService;
-	public PositionController(PositionService positionService)
+	private readonly UserServiceAccessor userServiceAccessor;
+	public PositionController(PositionService positionService, UserServiceAccessor userServiceAccessor)
 	{
 		this.positionService = positionService;
+		this.userServiceAccessor = userServiceAccessor;
 	}
 
 	[Produces("application/json")]
@@ -24,6 +28,18 @@ public class PositionController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await positionService.FindAll());
 		}catch(Exception ex)
 		{
@@ -38,6 +54,18 @@ public class PositionController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await positionService.FindById(id));
 		}
 		catch (Exception ex)
@@ -53,6 +81,18 @@ public class PositionController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await positionService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -67,6 +107,18 @@ public class PositionController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody] PositionDTO request)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await positionService.Create(request);
 	}
 
@@ -75,6 +127,18 @@ public class PositionController : ControllerBase
 	[HttpPut("update/{id}")]
 	public async Task<IActionResult> Update(int id, [FromBody] PositionDTO request)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await positionService.Update(id, request);
 	}
 
@@ -83,6 +147,18 @@ public class PositionController : ControllerBase
 	[HttpDelete("delete/{id}")]
 	public  async Task<IActionResult> Delete(int id)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await positionService.Delete(id);
 	}
 }

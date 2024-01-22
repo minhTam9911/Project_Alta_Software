@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
 using Project_2_Web_API.Models;
@@ -8,13 +9,16 @@ using Project_2_Web_API.Models;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class GrantPermissionController : ControllerBase
 {
 
 	private readonly GrantPermissionService grantPermissionService;
-	public GrantPermissionController(GrantPermissionService grantPermissionService)
+	private readonly UserServiceAccessor userServiceAccessor;
+	public GrantPermissionController(GrantPermissionService grantPermissionService, UserServiceAccessor userServiceAccessor)
 	{
 		this.grantPermissionService = grantPermissionService;
+		this.userServiceAccessor = userServiceAccessor;
 	}
 
 	[Produces("application/json")]
@@ -24,6 +28,18 @@ public class GrantPermissionController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await grantPermissionService.FindAll());
 		}catch(Exception ex)
 		{
@@ -38,6 +54,18 @@ public class GrantPermissionController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await grantPermissionService.FindById(id));
 		}
 		catch (Exception ex)
@@ -53,6 +81,18 @@ public class GrantPermissionController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await grantPermissionService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -66,6 +106,18 @@ public class GrantPermissionController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody]GrantPermissionDTO request)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await grantPermissionService.Create(request);
 	}
 
@@ -74,6 +126,18 @@ public class GrantPermissionController : ControllerBase
 	[HttpPut("update/{id}")]
 	public async Task<IActionResult> Put(int id, [FromBody] GrantPermissionDTO request)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await grantPermissionService.Update(id, request);
 	}
 
@@ -82,6 +146,18 @@ public class GrantPermissionController : ControllerBase
 	[HttpDelete("delete/{id}")]
 	public async Task<IActionResult> Delete(int id)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await grantPermissionService.Delete(id);
 	}
 }

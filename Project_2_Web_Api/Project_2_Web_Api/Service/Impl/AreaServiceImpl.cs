@@ -132,9 +132,43 @@ public class AreaServiceImpl : AreaService
 		}
 	}
 
-	public async Task<IActionResult> RemoveStaffInArea(int idArea, int idStaff)
+	public async Task<IActionResult> RemoveStaffInArea(int idArea, string _idStaff)
 	{
-		throw new NotImplementedException();
+		Guid idStaff;
+		bool parseGuid = Guid.TryParse(_idStaff, out idStaff);
+		try
+		{
+			if (parseGuid == false)
+			{
+				return new BadRequestObjectResult(new { error = "Id Statff invalid !!" });
+			}
+			if (await db.StaffUsers.FindAsync(idStaff) == null)
+			{
+				return new BadRequestObjectResult(new { error = "ID Staff does not exist!" });
+			}
+			var area = await db.Areas.FirstOrDefaultAsync(x => x.Id == idArea);
+			if (area == null)
+			{
+				return new BadRequestObjectResult(new { error = "ID Area does not exist!" });
+			}
+			
+				area.StaffUsers.Remove(await db.StaffUsers.FindAsync(idStaff));
+			
+			db.Entry(area).State = EntityState.Modified;
+			int check = await db.SaveChangesAsync();
+			if (check > 0)
+			{
+				return new OkObjectResult(new { msg = "Remove successfully!" });
+			}
+			else
+			{
+				return new BadRequestObjectResult(new { error = "Remove failure!" });
+			}
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult(new { error = ex.Message });
+		}
 	}
 
 	public async Task<IActionResult> Delete(int id)
@@ -284,13 +318,80 @@ public class AreaServiceImpl : AreaService
 		}
 	}
 
-	public Task<IActionResult> AddDistributorToArea(int idArea, int idStaff)
+	public async Task<IActionResult> AddDistributorToArea(int idArea, string _idDistributor)
 	{
-		throw new NotImplementedException();
+		Guid idDistributor;
+		bool parseGuid = Guid.TryParse(_idDistributor, out idDistributor);
+		try
+		{
+			if (parseGuid == false)
+			{
+				return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+			}
+			if (await db.Distributors.FindAsync(idDistributor) == null)
+			{
+				return new BadRequestObjectResult(new { error = "ID Distributor does not exist!" });
+			}
+			var area = await db.Areas.FirstOrDefaultAsync(x => x.Id == idArea);
+			if (area == null)
+			{
+				return new BadRequestObjectResult(new { error = "ID Area does not exist!" });
+			}
+			var distributor = await db.Distributors.FirstOrDefaultAsync(x => x.Id == idDistributor);
+			area.Distributors.Add(distributor);
+			db.Entry(area).State = EntityState.Modified;
+			int check = await db.SaveChangesAsync();
+			if (check > 0)
+			{
+				return new OkObjectResult(new { msg = "Added successfully!" });
+			}
+			else
+			{
+				return new BadRequestObjectResult(new { error = "Added failure!" });
+			}
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult(new { error = ex.Message });
+		}
 	}
 
-	public Task<IActionResult> RemoveDistributorInArea(int idArea, int idStaff)
+	public async Task<IActionResult> RemoveDistributorInArea(int idArea, string _idDistributor)
 	{
-		throw new NotImplementedException();
+		Guid idDistributor;
+		bool parseGuid = Guid.TryParse(_idDistributor, out idDistributor);
+		try
+		{
+			if (parseGuid == false)
+			{
+				return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+			}
+			if (await db.Distributors.FindAsync(idDistributor) == null)
+			{
+				return new BadRequestObjectResult(new { error = "ID Distributor does not exist!" });
+			}
+			var area = await db.Areas.FirstOrDefaultAsync(x => x.Id == idArea);
+			if (area == null)
+			{
+				return new BadRequestObjectResult(new { error = "ID Area does not exist!" });
+			}
+			
+				area.Distributors.Remove( await db.Distributors.FindAsync(idDistributor));
+			
+			db.Entry(area).State = EntityState.Modified;
+			int check = await db.SaveChangesAsync();
+			if (check > 0)
+			{
+				return new OkObjectResult(new { msg = "Remove successfully!" });
+			}
+			else
+			{
+				return new BadRequestObjectResult(new { error = "Remove failure!" });
+			}
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult(new { error = ex.Message });
+		}
 	}
 }

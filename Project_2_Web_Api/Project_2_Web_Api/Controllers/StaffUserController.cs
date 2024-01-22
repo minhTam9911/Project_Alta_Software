@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
 
@@ -7,13 +8,14 @@ using Project_2_Web_Api.Service;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class StaffUserController : ControllerBase
 {
-/*	private readonly UserServiceAccessor _userServiceAccessor;*/
+	private readonly UserServiceAccessor userServiceAccessor;
 	private readonly StaffUserService staffUserService;
 	public StaffUserController(UserServiceAccessor userServiceAccessor, StaffUserService staffUserService)
 	{
-	//	_userServiceAccessor = userServiceAccessor;
+		this.userServiceAccessor = userServiceAccessor;
 		this.staffUserService = staffUserService;
 	}
 
@@ -24,6 +26,18 @@ public class StaffUserController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await staffUserService.FindAll());
 		}
 		catch (Exception ex)
@@ -39,6 +53,18 @@ public class StaffUserController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await staffUserService.FindById(id));
 		}
 		catch (Exception ex)
@@ -54,6 +80,18 @@ public class StaffUserController : ControllerBase
 	{
 		try
 		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsSales())
+			{
+				return Unauthorized();
+			}
 			return Ok(await staffUserService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -67,6 +105,18 @@ public class StaffUserController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody] StaffUserDTO request)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await staffUserService.Create(request);
 	}
 
@@ -75,6 +125,18 @@ public class StaffUserController : ControllerBase
 	[HttpPut("update/{id}")]
 	public async Task<IActionResult> Update(string id, [FromBody] StaffUserDTO request)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await staffUserService.Update(id, request);
 	}
 
@@ -83,6 +145,22 @@ public class StaffUserController : ControllerBase
 	[HttpDelete("delete/{id}")]
 	public async Task<IActionResult> Delete(string id)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if(await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await staffUserService.Delete(id);
 	}
 
@@ -91,6 +169,40 @@ public class StaffUserController : ControllerBase
 	[HttpPut("reset-password")]
 	public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
 	{
+		if (await userServiceAccessor.IsGuest())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsDistributor())
+		{
+			return Unauthorized();
+		}
+		if (await userServiceAccessor.IsSales())
+		{
+			return Unauthorized();
+		}
 		return await staffUserService.ResetPassword(request.Id);
+	}
+	[Produces("application/json")]
+	[Consumes("application/json")]
+	[HttpGet("get-me")]
+	public async Task<IActionResult> GetMe()
+	{
+		try
+		{
+			if (await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if (await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
+			return Ok(await staffUserService.FindById(User?.Identity?.Name));
+		}
+		catch (Exception ex)
+		{
+			return BadRequest(new { error = ex.Message });
+		}
 	}
 }

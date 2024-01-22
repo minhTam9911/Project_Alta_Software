@@ -12,4 +12,5 @@ public interface StaffUserService
 	Task<dynamic> FindById(string id);
 	Task<dynamic> FindByName(string name);
 	Task<IActionResult> ResetPassword(string id);
+	Task<IActionResult> SettingPermission(string id, int[] permissions);
 }

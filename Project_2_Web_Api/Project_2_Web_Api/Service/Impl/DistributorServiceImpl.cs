@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Helplers;
 using Project_2_Web_API.Models;
+using System.Security.Claims;
 
 namespace Project_2_Web_Api.Service.Impl;
 
@@ -62,25 +64,33 @@ public class DistributorServiceImpl : DistributorService
 				{
 					return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
 				}
-
+				distributor.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
 				distributor.CreatedDate = DateTime.Now;
 				distributor.PhotoAvatar = "avatar-default-icon.png";
 				var password = RandomHelper.RandomDefaultPassword(12);
 				var mailHelper = new MailHelper(configuration);
 				Guid idSaleManagement;
-				bool parseGuid1 = Guid.TryParse(distributorDTO.SaleManagementId, out idSaleManagement);
+				bool parseGuid1 = Guid.TryParse(distributorDTO.IdSaleManagement, out idSaleManagement);
 				
 				if (parseGuid1 == false)
 				{
 					return new BadRequestObjectResult(new { error = "Id Sale Management invalid !!" });
 				}
-				if(distributorDTO.SalesId != null)
+				if (await db.StaffUsers.FindAsync(idSaleManagement) == null)
+				{
+					return new BadRequestObjectResult(new { error = "Id Sale Management not exist !!" });
+				}
+				if (!distributorDTO.IdSales.IsNullOrEmpty())
 				{
 					Guid idSales;
-					bool parseGuid2 = Guid.TryParse(distributorDTO.SalesId, out idSales);
+					bool parseGuid2 = Guid.TryParse(distributorDTO.IdSales, out idSales);
 					if (parseGuid1 == false)
 					{
 						return new BadRequestObjectResult(new { error = "Id Sales invalid !!" });
+					}
+					if (await db.StaffUsers.FindAsync(idSales) == null)
+					{
+						return new BadRequestObjectResult(new { error = "Id Sales not exist !!" });
 					}
 					distributor.SalesId = idSales;
 				}
@@ -92,7 +102,7 @@ public class DistributorServiceImpl : DistributorService
 						"<h2>=>Password: " + password + "</h2><br>" +
 						"<h3>This is only a temporary password, please log in and change it.</h3><br>" +
 						"<h2>Thank you very much!</h2>";
-				var check = mailHelper.Send(configuration["Gmail:Username"], distributor.Email, "Welcome " + distributor.Name + "to join CDExcellent", content);
+				var check = mailHelper.Send(configuration["Gmail:Username"], distributor.Email, "Welcome " + distributor.Name + " to join CDExcellent", content);
 				if (!check)
 				{
 					return new BadRequestObjectResult(new { error = "Email sending failed." });
@@ -152,6 +162,11 @@ public class DistributorServiceImpl : DistributorService
 				{
 					return new BadRequestObjectResult(new { error = "Position not exist!!" });
 				}
+				var checkPosition = await db.Positions.FindAsync(distributor.PositionId);
+				if (checkPosition.Name.ToLower() != "distributor - om/tl")
+				{
+					return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
+				}
 				else
 				{
 					var data = await db.Distributors.FindAsync(idDistributor);
@@ -160,19 +175,27 @@ public class DistributorServiceImpl : DistributorService
 						return new BadRequestObjectResult(new { error = "Id Distributor not exist!!" });
 					}
 					Guid idSaleManagement;
-					bool parseGuid1 = Guid.TryParse(distributorDTO.SaleManagementId, out idSaleManagement);
+					bool parseGuid1 = Guid.TryParse(distributorDTO.IdSaleManagement, out idSaleManagement);
 
 					if (parseGuid1 == false)
 					{
 						return new BadRequestObjectResult(new { error = "Id Sale Management invalid !!" });
 					}
-					if (distributorDTO.SalesId != null)
+					if(await db.StaffUsers.FindAsync(idSaleManagement) == null)
+					{
+						return new BadRequestObjectResult(new { error = "Id Sale Management not exist !!" });
+					}
+					if (distributorDTO.IdSales != null)
 					{
 						Guid idSales;
-						bool parseGuid2 = Guid.TryParse(distributorDTO.SalesId, out idSales);
+						bool parseGuid2 = Guid.TryParse(distributorDTO.IdSales, out idSales);
 						if (parseGuid1 == false)
 						{
 							return new BadRequestObjectResult(new { error = "Id Sales invalid !!" });
+						}
+						if (await db.StaffUsers.FindAsync(idSales) == null)
+						{
+							return new BadRequestObjectResult(new { error = "Id Sales not exist !!" });
 						}
 						distributor.SalesId = idSales;
 						data.SalesId = distributor.SalesId;
@@ -257,8 +280,11 @@ public class DistributorServiceImpl : DistributorService
 				salesName = x.Name,
 				positionId = x.PositionId,
 				positionName = x.Position.Name,
-				areaId = x.Area.Id,
-				areaName = x.Area.Name,
+				area = x.Area == null? null : new
+				{
+					id= x.Area.Id,
+					name = x.Area.Name
+				},
 				status = x.IsStatus,
 				createBy = x.StaffUser.Fullname
 
@@ -278,7 +304,7 @@ public class DistributorServiceImpl : DistributorService
 		{
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+				return new { error = "Id Distributor invalid !!" };
 			}
 			if (await db.Distributors.AnyAsync() == false || await db.Distributors.FindAsync(idDistributor) == null)
 			{
@@ -297,8 +323,11 @@ public class DistributorServiceImpl : DistributorService
 				salesName = x.Name,
 				positionId = x.PositionId,
 				positionName = x.Position.Name,
-				areaId = x.Area.Id,
-				areaName = x.Area.Name,
+				area = x.Area == null ? null : new
+				{
+					id = x.Area.Id,
+					name = x.Area.Name
+				},
 				status = x.IsStatus,
 				createBy = x.StaffUser.Fullname
 
@@ -306,7 +335,7 @@ public class DistributorServiceImpl : DistributorService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new { error = ex.Message };
 		}
 	}
 
@@ -333,8 +362,11 @@ public class DistributorServiceImpl : DistributorService
 				salesName = x.Name,
 				positionId = x.PositionId,
 				positionName = x.Position.Name,
-				areaId = x.Area.Id,
-				areaName = x.Area.Name,
+				area = x.Area == null ? null : new
+				{
+					id = x.Area.Id,
+					name = x.Area.Name
+				},
 				status = x.IsStatus,
 				createBy = x.StaffUser.Fullname
 

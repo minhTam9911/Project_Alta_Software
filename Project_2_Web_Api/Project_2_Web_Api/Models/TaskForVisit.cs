@@ -22,7 +22,7 @@ public class TaskForVisit
 	[Required]
 	public DateTime? EndDate {  get; set; }
 
-	public int? CreateBy { get; set; }
+	public Guid? CreateBy { get; set; }
 	public string? PhotoPath {  get; set; }
 	public string? Status { get; set; }
 
