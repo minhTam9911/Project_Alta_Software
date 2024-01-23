@@ -103,18 +103,6 @@ public class UserController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody] UserDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
 		return await userService.Create(request);
 	}
 
@@ -123,18 +111,7 @@ public class UserController : ControllerBase
 	[HttpPut("update/{id}")]
 	public async Task<IActionResult> Update(string id, [FromBody] UserDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await userService.Update(id, request);
 	}
 
@@ -164,18 +141,7 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return await userService.SettingPermission(request.Id, request.PermissionId);
 		}
 		catch (Exception ex)
@@ -189,18 +155,6 @@ public class UserController : ControllerBase
 	[HttpPut("reset-password")]
 	public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
 		return await userService.ResetPassword(request.Id);
 	}
 
@@ -211,19 +165,7 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
-			if(await userServiceAccessor.IsSystem())
-			{
-				return Unauthorized();
-			}
-			return Ok(await userService.FindById(User?.Identity?.Name));
+			return Ok(await userServiceAccessor.GetByMe());
 		}
 		catch (Exception ex)
 		{

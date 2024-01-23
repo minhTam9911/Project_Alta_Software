@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Helplers;
 using Project_2_Web_API.Models;
 using System.Net.Mail;
+using System.Security.Cryptography;
 
 namespace Project_2_Web_Api.Service.Impl;
 
@@ -14,43 +17,77 @@ public class SupportAccountServiceImpl : SupportAccountService
 	private readonly IHttpContextAccessor _httpContextAccessor;
 	private readonly IMapper mapper;
 	private readonly IConfiguration configuration;
-	public SupportAccountServiceImpl(DatabaseContext db,IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+	private readonly UserServiceAccessor userServiceAccessor;
+	public SupportAccountServiceImpl(DatabaseContext db,IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper, UserServiceAccessor userServiceAccessor)
 	{
 		this.configuration = configuration;
 		this.mapper = mapper;
 		_httpContextAccessor = httpContextAccessor;
 		this.db = db;
+		this.userServiceAccessor = userServiceAccessor;
 	}
 
-	public async Task<IActionResult> ChangePassword(string id, string oldPassword, string newPassword)
+	public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword)
 	{
-		Guid idUser;
-		bool parseGuid = Guid.TryParse(id, out idUser);
 		try
 		{
-			if (parseGuid == false)
+
+			if (await userServiceAccessor.IsGuest())
 			{
-				return new BadRequestObjectResult(new { error = "Id user invalid !!" });
+				var data = await db.Users.FindAsync(userServiceAccessor.GetById());
+				if (!BCrypt.Net.BCrypt.Verify(oldPassword, data.Password))
+				{
+					return new BadRequestObjectResult(new { error = "The old password does not match the new password!!" });
+				}
+				var hashPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+				data.Password = hashPassword;
+				db.Entry(data).State = EntityState.Modified;
+				if (await db.SaveChangesAsync() > 0)
+				{
+					return new OkObjectResult(new { msg = "Update Password successfully !!!" });
+				}
+				else
+				{
+					return new BadRequestObjectResult(new { error = "Update Password failure !!" });
+				}
 			}
-			var data = await db.Users.FindAsync(idUser);
-			if (data == null)
+			else if (await userServiceAccessor.IsDistributor())
 			{
-				return new BadRequestObjectResult(new { error = "Id does not exist !!" });
-			}
-			if (!BCrypt.Net.BCrypt.Verify(oldPassword, data.Password))
-			{
-				return new BadRequestObjectResult(new { error = "The old password does not match the new password!!" });
-			}
-			var hashPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
-			data.Password = hashPassword;
-			db.Entry(data).State = EntityState.Modified;
-			if (await db.SaveChangesAsync() > 0)
-			{
-				return new OkObjectResult(new { msg = "Update Password successfully !!!" });
+				var data = await db.Distributors.FindAsync(userServiceAccessor.GetById());
+				if (!BCrypt.Net.BCrypt.Verify(oldPassword, data.Password))
+				{
+					return new BadRequestObjectResult(new { error = "The old password does not match the new password!!" });
+				}
+				var hashPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+				data.Password = hashPassword;
+				db.Entry(data).State = EntityState.Modified;
+				if (await db.SaveChangesAsync() > 0)
+				{
+					return new OkObjectResult(new { msg = "Update Password successfully !!!" });
+				}
+				else
+				{
+					return new BadRequestObjectResult(new { error = "Update Password failure !!" });
+				}
 			}
 			else
 			{
-				return new BadRequestObjectResult(new { error = "Update Password failure !!" });
+				var data = await db.StaffUsers.FindAsync(userServiceAccessor.GetById());
+				if (!BCrypt.Net.BCrypt.Verify(oldPassword, data.Password))
+				{
+					return new BadRequestObjectResult(new { error = "The old password does not match the new password!!" });
+				}
+				var hashPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+				data.Password = hashPassword;
+				db.Entry(data).State = EntityState.Modified;
+				if (await db.SaveChangesAsync() > 0)
+				{
+					return new OkObjectResult(new { msg = "Update Password successfully !!!" });
+				}
+				else
+				{
+					return new BadRequestObjectResult(new { error = "Update Password failure !!" });
+				}
 			}
 		}
 		catch (Exception ex)
@@ -75,11 +112,17 @@ public class SupportAccountServiceImpl : SupportAccountService
 			var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
 			var staff = await db.StaffUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
 			var distributor = await db.Distributors.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
+			string? token = null;
 			if (user != null)
 			{
+				user.PasswordResetToken = RandomToken();
+				user.ResetTokenExpires = DateTime.Now.AddHours(1);
 				user.SecurityCode = security;
 				db.Entry(user).State = EntityState.Modified;
-				if (await db.SaveChangesAsync() > 0) ;
+				if (await db.SaveChangesAsync() > 0)
+				{
+					token = user.PasswordResetToken;
+				}
 				else
 				{
 					return new BadRequestObjectResult(new { error = "The system encountered a problem !!" });
@@ -88,8 +131,13 @@ public class SupportAccountServiceImpl : SupportAccountService
 			else if (staff != null)
 			{
 				staff.SecurityCode = security;
+				staff.PasswordResetToken = RandomToken();
+				staff.ResetTokenExpires = DateTime.Now.AddHours(1);
 				db.Entry(staff).State = EntityState.Modified;
-				if (await db.SaveChangesAsync() > 0) ;
+				if (await db.SaveChangesAsync() > 0)
+				{
+					token = staff.PasswordResetToken;
+				}
 				else
 				{
 					return new BadRequestObjectResult(new { error = "The system encountered a problem !!" });
@@ -98,8 +146,13 @@ public class SupportAccountServiceImpl : SupportAccountService
 			else if (distributor != null)
 			{
 				distributor.SecurityCode = security;
+				distributor.PasswordResetToken = RandomToken();
+				distributor.ResetTokenExpires = DateTime.Now.AddHours(1);
 				db.Entry(distributor).State = EntityState.Modified;
-				if (await db.SaveChangesAsync() > 0) ;
+				if (await db.SaveChangesAsync() > 0)
+				{
+					token = distributor.PasswordResetToken;
+				}
 				else
 				{
 					return new BadRequestObjectResult(new { error = "The system encountered a problem !!" });
@@ -110,19 +163,15 @@ public class SupportAccountServiceImpl : SupportAccountService
 				return new BadRequestObjectResult(new { error = "Email does not exist" });
 			}
 			var mailHelper = new MailHelper(configuration);
-			var content = "<h2>Verify Your Recovery  Email</h2><br><br>" +
-						"<h5>CDExcellent has received a request to use.</h5>" + email + "<br>" +
-						"<h5>Use this code to complete password recovery./h5><br>" +
-						"<h3>=>Security Code: " + security + ".</h3><br>" +
-						"<h5>Thank you very much!</h5>";
-			var check = mailHelper.Send(configuration["Gmail:Username"], email, "Email verification code", content);
+			
+			var check = mailHelper.Send(configuration["Gmail:Username"], email, "Email verification code", MailHelper.HtmlVerify(security));
 			if (!check)
 			{
 				return new BadRequestObjectResult(new { error = "Email sending failed." });
 			}
 			else
 			{
-				return new OkObjectResult(new { msg = "Please check the email you just entered" });
+				return new OkObjectResult(new { msg = token });
 			}
 
 		}
@@ -132,24 +181,20 @@ public class SupportAccountServiceImpl : SupportAccountService
 		}
 	}
 
-	public async Task<IActionResult> VerifySecurityCode(string email, string code)
+	public async Task<IActionResult> VerifySecurityCode(ForgotPasswordRequest forgotPasswordRequest)
 	{
 		try
 		{
-			if (email == null)
+			if (forgotPasswordRequest.Token.IsNullOrEmpty())
 			{
-				return new BadRequestObjectResult(new { error = "Email cannot be empty !!" });
+				return new BadRequestObjectResult(new { error = "TOken is requried !!" });
 			}
-			if (!CheckEmail(email))
-			{
-				return new BadRequestObjectResult(new { error = "Email invalidate" });
-			}
-			var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
-			var staff = await db.StaffUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
-			var distributor = await db.Distributors.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
+			var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.PasswordResetToken == forgotPasswordRequest.Token && x.ResetTokenExpires > DateTime.Now);
+			var staff = await db.StaffUsers.AsNoTracking().FirstOrDefaultAsync(x => x.PasswordResetToken == forgotPasswordRequest.Token && x.ResetTokenExpires > DateTime.Now);
+			var distributor = await db.Distributors.AsNoTracking().FirstOrDefaultAsync(x => x.PasswordResetToken == forgotPasswordRequest.Token && x.ResetTokenExpires > DateTime.Now);
 			if (user != null)
 			{
-				if (user.SecurityCode == code)
+				if (user.SecurityCode == forgotPasswordRequest.Code)
 				{
 					user.SecurityCode = null;
 					db.Entry(user).State = EntityState.Modified;
@@ -168,7 +213,7 @@ public class SupportAccountServiceImpl : SupportAccountService
 			}
 			else if (staff != null)
 			{
-				if (staff.SecurityCode == code)
+				if (staff.SecurityCode == forgotPasswordRequest.Code)
 				{
 					staff.SecurityCode = null;
 					db.Entry(staff).State = EntityState.Modified;
@@ -185,7 +230,7 @@ public class SupportAccountServiceImpl : SupportAccountService
 			}
 			else if (distributor != null)
 			{
-				if (distributor.SecurityCode == code)
+				if (distributor.SecurityCode == forgotPasswordRequest.Code)
 				{
 					distributor.SecurityCode = null;
 					db.Entry(distributor).State = EntityState.Modified;
@@ -214,25 +259,26 @@ public class SupportAccountServiceImpl : SupportAccountService
 		}
 	}
 
-	public async Task<IActionResult> ChangeForgotPassword(string email, string newPassword)
+	public async Task<IActionResult> ChangeForgotPassword(NewPasswordRequest newPasswordRequest)
 	{
 		try
 		{
-			if (email == null)
+			if (newPasswordRequest.Token.IsNullOrEmpty())
 			{
-				return new BadRequestObjectResult(new { error = "Email cannot be empty !!" });
+				return new BadRequestObjectResult(new { error = "TOken is requried!!" });
 			}
-			if (!CheckEmail(email))
-			{
-				return new BadRequestObjectResult(new { error = "Email invalidate" });
+			var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.PasswordResetToken == newPasswordRequest.NewPassword && x.ResetTokenExpires>DateTime.Now);
+			var staff = await db.StaffUsers.AsNoTracking().FirstOrDefaultAsync(x => x.PasswordResetToken == newPasswordRequest.NewPassword && x.ResetTokenExpires > DateTime.Now);
+			var distributor = await db.Distributors.AsNoTracking().FirstOrDefaultAsync(x => x.PasswordResetToken == newPasswordRequest.NewPassword && x.ResetTokenExpires > DateTime.Now);
+			var hashPassword = BCrypt.Net.BCrypt.HashPassword(newPasswordRequest.NewPassword);
+			if (!BCrypt.Net.BCrypt.Verify(newPasswordRequest.ConfirmPassword, hashPassword)){
+				return new BadRequestObjectResult(new { error = "Password and confirm password not match!!" });
 			}
-			var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
-			var staff = await db.StaffUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
-			var distributor = await db.Distributors.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
-			var hashPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
 			if (user != null)
 			{
 				user.Password = hashPassword;
+				user.ResetTokenExpires = null;
+				user.PasswordResetToken = null;
 				db.Entry(user).State = EntityState.Modified;
 				if (await db.SaveChangesAsync() > 0) ;
 				else
@@ -243,6 +289,8 @@ public class SupportAccountServiceImpl : SupportAccountService
 			else if (staff != null)
 			{
 				staff.Password = hashPassword;
+				staff.ResetTokenExpires = null;
+				staff.PasswordResetToken = null;
 				db.Entry(staff).State = EntityState.Modified;
 				if (await db.SaveChangesAsync() > 0) ;
 				else
@@ -253,6 +301,8 @@ public class SupportAccountServiceImpl : SupportAccountService
 			else if (distributor != null)
 			{
 				distributor.Password = hashPassword;
+				distributor.ResetTokenExpires = null;
+				distributor.PasswordResetToken = null;
 				db.Entry(distributor).State = EntityState.Modified;
 				if (await db.SaveChangesAsync() > 0) ;
 				else
@@ -286,6 +336,10 @@ public class SupportAccountServiceImpl : SupportAccountService
 			return false;
 		}
 		return valid;
+	}
+	private string RandomToken()
+	{
+		return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
 	}
 
 	

@@ -17,8 +17,10 @@ public class UserServiceImpl : UserService
 	private readonly IHttpContextAccessor _httpContextAccessor;
 	private readonly IMapper mapper;
 	private IConfiguration configuration;
-	public UserServiceImpl(DatabaseContext db,IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+	private readonly UserServiceAccessor userServiceAccessor;
+	public UserServiceImpl(DatabaseContext db,IConfiguration configuration,UserServiceAccessor userServiceAccessor, IHttpContextAccessor httpContextAccessor, IMapper mapper)
 	{
+		this.userServiceAccessor = userServiceAccessor;
 		this.mapper = mapper;
 		this.configuration = configuration;
 		_httpContextAccessor = httpContextAccessor;
@@ -40,40 +42,35 @@ public class UserServiceImpl : UserService
 			}
 			else
 			{
-				if (await db.Users.FirstOrDefaultAsync(x => x.Email == userDTO.Email) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == userDTO.Email) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == userDTO.Email) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.Positions.FindAsync(user.PositionId) == null)
-				{
-					return new BadRequestObjectResult(new { error = "Position not exist!!" });
-				}
-				var checkPosition = await db.Positions.FindAsync(user.PositionId);
-				if(checkPosition.Name.ToLower() != "guest" && checkPosition.Name.ToLower() != "other department")
-				{
-					return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Guest' or 'Other Department'" });
-				}
-				user.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
+				if (await userServiceAccessor.CheckPermission("Add new users") || await userServiceAccessor.IsSystem()){
+					if (await db.Users.FirstOrDefaultAsync(x => x.Email == userDTO.Email) != null)
+					{
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					}
+					if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == userDTO.Email) != null)
+					{
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					}
+					if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == userDTO.Email) != null)
+					{
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					}
+					if (await db.Positions.FindAsync(user.PositionId) == null)
+					{
+						return new BadRequestObjectResult(new { error = "Position not exist!!" });
+					}
+					var checkPosition = await db.Positions.FindAsync(user.PositionId);
+					if (checkPosition.Name.ToLower() != "guest" && checkPosition.Name.ToLower() != "other department")
+					{
+						return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Guest' or 'Other Department'" });
+					}
+					user.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
 					user.CreatedDate = DateTime.Now;
 					var password = RandomHelper.RandomDefaultPassword(12);
 					var mailHelper = new MailHelper(configuration);
-				user.PhotoAvatar = "avatar-default-icon.png";
-					var content = "<h2>CDExcellent</h2><br><br>" +
-								"<h2>Hello " + user.FullName + "!</h2><br>" +
-							"<h3>CDExcellent is glad you signed up.</h3><br>" +
-							"<h2>=>Your account: " + user.Email + "</h2><br>" +
-							"<h2>=>Password: " + password + "</h2><br>" +
-							"<h3>This is only a temporary password, please log in and change it.</h3><br>" +
-							"<h2>Thank you very much!</h2>";
-				var check = mailHelper.Send(configuration["Gmail:Username"],user.Email,"Welcome "+user.FullName+ " to join CDExcellent", content);
+					user.PhotoAvatar = "avatar-default-icon.png";
+
+					var check = mailHelper.Send(configuration["Gmail:Username"], user.Email, "Welcome " + user.FullName + " to join CDExcellent", MailHelper.HtmlNewAccount(user.FullName, user.Email, password));
 					if (!check)
 					{
 						return new BadRequestObjectResult(new { error = "Email sending failed." });
@@ -89,7 +86,11 @@ public class UserServiceImpl : UserService
 					{
 						return new BadRequestObjectResult(new { error = "Added failure !!" });
 					}
-				
+				}
+				else
+				{
+					return new UnauthorizedResult();
+				}
 			}
 		}
 		catch (Exception ex)
@@ -117,38 +118,44 @@ public class UserServiceImpl : UserService
 			}
 			else
 			{
-				if (await db.Users.FirstOrDefaultAsync(x => x.Email == user.Email && x.Id != idUser) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == user.Email) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == user.Email) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.Positions.FindAsync(user.PositionId) == null)
-				{
-					return new BadRequestObjectResult(new { error = "Position not exist!!" });
-				}
-				else
-				{
-					var data = await db.Users.FindAsync(idUser);
-					data.IsStatus = user.IsStatus;
-					data.FullName = user.FullName;
-					data.Email = user.Email;
-					data.PositionId = user.PositionId;
-					db.Entry(data).State = EntityState.Modified;
-					if (await db.SaveChangesAsync() > 0)
+				if (await userServiceAccessor.CheckPermission("Update user detail") || await userServiceAccessor.IsSystem()){
+					if (await db.Users.FirstOrDefaultAsync(x => x.Email == user.Email && x.Id != idUser) != null)
 					{
-						return new OkObjectResult(new { msg = "Update successfully !!" });
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					}
+					if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == user.Email) != null)
+					{
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					}
+					if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == user.Email) != null)
+					{
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					}
+					if (await db.Positions.FindAsync(user.PositionId) == null)
+					{
+						return new BadRequestObjectResult(new { error = "Position not exist!!" });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Update failure !!" });
+						var data = await db.Users.FindAsync(idUser);
+						data.IsStatus = user.IsStatus;
+						data.FullName = user.FullName;
+						data.Email = user.Email;
+						data.PositionId = user.PositionId;
+						db.Entry(data).State = EntityState.Modified;
+						if (await db.SaveChangesAsync() > 0)
+						{
+							return new OkObjectResult(new { msg = "Update successfully !!" });
+						}
+						else
+						{
+							return new BadRequestObjectResult(new { error = "Update failure !!" });
+						}
 					}
+				}
+				else
+				{
+					return new UnauthorizedResult();
 				}
 			}
 		}
@@ -306,34 +313,41 @@ public class UserServiceImpl : UserService
 		bool parseGuid = Guid.TryParse(id, out idUser);
 		try
 		{
-			if (parseGuid == false)
+			if (await userServiceAccessor.CheckPermission("Permission setting") || await userServiceAccessor.IsSystem())
 			{
-				return new BadRequestObjectResult(new { error = "Id User invalid !!" });
-			}
-			var data = await db.Users.FindAsync(idUser);
-			if (data == null)
-			{
-				return new BadRequestObjectResult(new { error = "Id User does not exist !!" });
-			}
-			var permissionDB = await db.GrantPermissions.ToListAsync();
-			foreach(var permision in permissions)
-			{
-				if(permissionDB.Any(x=>x.Id == permision))
+				if (parseGuid == false)
 				{
-					data.GrantPermissions.Add( await db.GrantPermissions.FindAsync(permision));
-					db.Entry(data).State = EntityState.Modified;
-					if (await db.SaveChangesAsync() > 0) ;
+					return new BadRequestObjectResult(new { error = "Id User invalid !!" });
+				}
+				var data = await db.Users.FindAsync(idUser);
+				if (data == null)
+				{
+					return new BadRequestObjectResult(new { error = "Id User does not exist !!" });
+				}
+				var permissionDB = await db.GrantPermissions.ToListAsync();
+				foreach (var permision in permissions)
+				{
+					if (permissionDB.Any(x => x.Id == permision))
+					{
+						data.GrantPermissions.Add(await db.GrantPermissions.FindAsync(permision));
+						db.Entry(data).State = EntityState.Modified;
+						if (await db.SaveChangesAsync() > 0) ;
+						else
+						{
+							return new BadRequestObjectResult(new { error = "The system encountered a problem !!" });
+						}
+					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "The system encountered a problem !!" });
+						return new BadRequestObjectResult(new { error = "ID Permission does not exist !!" });
 					}
 				}
-				else
-				{
-					return new BadRequestObjectResult(new { error = "ID Permission does not exist !!" });
-				}
+				return new OkObjectResult(new { msg = "Add permissions to user successfully" });
 			}
-			return new OkObjectResult(new { msg = "Add permissions to user successfully" });
+			else
+			{
+				return new UnauthorizedResult();
+			}
 		}
 		catch(Exception ex)
 		{
@@ -346,41 +360,48 @@ public class UserServiceImpl : UserService
 
 		try
 		{
-			Guid idUser;
-			bool parseGuid = Guid.TryParse(id, out idUser);
-			if (parseGuid == false)
+			if (await userServiceAccessor.CheckPermission("Reset password") || await userServiceAccessor.IsSystem())
 			{
-				return new BadRequestObjectResult(new { error = "Id User invalid !!" });
-			}
-			var user = await db.Users.FindAsync(idUser);
-			if (user == null)
-			{
-				return new BadRequestObjectResult(new { error = "Id User does not exist !!" });
-			}
-			var password = RandomHelper.RandomDefaultPassword(12);
-			var mailHelper = new MailHelper(configuration);
-			var content = "<h2>CDExcellent</h2><br><br>" +
-						"<h2>Hello " + user.FullName + "!</h2><br>" +
-					"<h3>CDExcellent is glad you signed up.</h3><br>" +
-					"<h2>=>Your account: " + user.Email + "</h2><br>" +
-					"<h2>=>Password: " + password + "</h2><br>" +
-					"<h3>This is only a temporary password, please log in and change it.</h3><br>" +
-					"<h2>Thank you very much!</h2>";
-			var check = mailHelper.Send(configuration["Gmail:Username"], user.Email, "Reset password account CDExcellent", content);
-			if (!check)
-			{
-				return new BadRequestObjectResult(new { error = "Email sending failed." });
-			}
-			var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
-			user.Password = hashPassword;
-			db.Entry(user).State = EntityState.Modified;
-			if (await db.SaveChangesAsync() > 0)
-			{
-				return new OkObjectResult(new { msg = "Reset password success !!" });
+				Guid idUser;
+				bool parseGuid = Guid.TryParse(id, out idUser);
+				if (parseGuid == false)
+				{
+					return new BadRequestObjectResult(new { error = "Id User invalid !!" });
+				}
+				var user = await db.Users.FindAsync(idUser);
+				if (user == null)
+				{
+					return new BadRequestObjectResult(new { error = "Id User does not exist !!" });
+				}
+				var password = RandomHelper.RandomDefaultPassword(12);
+				var mailHelper = new MailHelper(configuration);
+				var content = "<h2>CDExcellent</h2><br><br>" +
+							"<h2>Hello " + user.FullName + "!</h2><br>" +
+						"<h3>CDExcellent is glad you signed up.</h3><br>" +
+						"<h2>=>Your account: " + user.Email + "</h2><br>" +
+						"<h2>=>Password: " + password + "</h2><br>" +
+						"<h3>This is only a temporary password, please log in and change it.</h3><br>" +
+						"<h2>Thank you very much!</h2>";
+				var check = mailHelper.Send(configuration["Gmail:Username"], user.Email, "Reset password account CDExcellent", content);
+				if (!check)
+				{
+					return new BadRequestObjectResult(new { error = "Email sending failed." });
+				}
+				var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
+				user.Password = hashPassword;
+				db.Entry(user).State = EntityState.Modified;
+				if (await db.SaveChangesAsync() > 0)
+				{
+					return new OkObjectResult(new { msg = "Reset password success !!" });
+				}
+				else
+				{
+					return new BadRequestObjectResult(new { error = "Reset password failure !!" });
+				}
 			}
 			else
 			{
-				return new BadRequestObjectResult(new { error = "Reset password failure !!" });
+				return new UnauthorizedResult();
 			}
 
 		}

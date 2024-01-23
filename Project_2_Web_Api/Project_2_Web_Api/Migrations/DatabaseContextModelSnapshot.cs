@@ -119,8 +119,14 @@ namespace Project_2_Web_Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("NotificationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Password")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordResetToken")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -132,6 +138,9 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<int?>("PositionId")
                         .IsRequired()
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("ResetTokenExpires")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("SaleManagementId")
                         .HasColumnType("uniqueidentifier");
@@ -147,6 +156,8 @@ namespace Project_2_Web_Api.Migrations
                     b.HasIndex("AreaId");
 
                     b.HasIndex("CreateBy");
+
+                    b.HasIndex("NotificationId");
 
                     b.HasIndex("PositionId");
 
@@ -212,6 +223,70 @@ namespace Project_2_Web_Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Medias");
+                });
+
+            modelBuilder.Entity("Project_2_Web_Api.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("CreateBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("Project_2_Web_API.Models.PhotoPathAssigned", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Path")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TaskForVisitId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskForVisitId");
+
+                    b.ToTable("PhotoPathAssigned");
+                });
+
+            modelBuilder.Entity("Project_2_Web_API.Models.PhotoPathReporting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Path")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TaskForVisitId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TaskForVisitId");
+
+                    b.ToTable("PhotoPathReporting");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.Position", b =>
@@ -329,8 +404,14 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<bool?>("IsStatus")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("NotificationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Password")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordResetToken")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -343,12 +424,17 @@ namespace Project_2_Web_Api.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ResetTokenExpires")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityCode")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AreaId");
+
+                    b.HasIndex("NotificationId");
 
                     b.HasIndex("PositionId");
 
@@ -377,9 +463,6 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<DateTime?>("EndDate")
                         .IsRequired()
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("PhotoPath")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("ReportingStaffUserId")
                         .IsRequired()
@@ -434,8 +517,14 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<bool?>("IsStatus")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("NotificationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Password")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordResetToken")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
@@ -448,6 +537,9 @@ namespace Project_2_Web_Api.Migrations
                         .IsRequired()
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ResetTokenExpires")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityCode")
                         .HasColumnType("nvarchar(max)");
 
@@ -456,6 +548,8 @@ namespace Project_2_Web_Api.Migrations
                     b.HasIndex("AreaId");
 
                     b.HasIndex("CreateBy");
+
+                    b.HasIndex("NotificationId");
 
                     b.HasIndex("PositionId");
 
@@ -541,6 +635,10 @@ namespace Project_2_Web_Api.Migrations
                         .WithMany()
                         .HasForeignKey("CreateBy");
 
+                    b.HasOne("Project_2_Web_Api.Models.Notification", null)
+                        .WithMany("Distributors")
+                        .HasForeignKey("NotificationId");
+
                     b.HasOne("Project_2_Web_API.Models.Position", "Position")
                         .WithMany()
                         .HasForeignKey("PositionId")
@@ -581,6 +679,20 @@ namespace Project_2_Web_Api.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("Project_2_Web_API.Models.PhotoPathAssigned", b =>
+                {
+                    b.HasOne("Project_2_Web_API.Models.TaskForVisit", null)
+                        .WithMany("PhotoPathAssigned")
+                        .HasForeignKey("TaskForVisitId");
+                });
+
+            modelBuilder.Entity("Project_2_Web_API.Models.PhotoPathReporting", b =>
+                {
+                    b.HasOne("Project_2_Web_API.Models.TaskForVisit", null)
+                        .WithMany("PhotoPathReporting")
+                        .HasForeignKey("TaskForVisitId");
+                });
+
             modelBuilder.Entity("Project_2_Web_API.Models.Position", b =>
                 {
                     b.HasOne("Project_2_Web_API.Models.PositionGroup", "PositionGroup")
@@ -594,11 +706,11 @@ namespace Project_2_Web_Api.Migrations
 
             modelBuilder.Entity("Project_2_Web_API.Models.Post", b =>
                 {
-                    b.HasOne("Project_2_Web_API.Models.StaffUser", "User")
+                    b.HasOne("Project_2_Web_API.Models.StaffUser", "StaffUser")
                         .WithMany()
                         .HasForeignKey("CreateBy");
 
-                    b.Navigation("User");
+                    b.Navigation("StaffUser");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.StaffUser", b =>
@@ -606,6 +718,10 @@ namespace Project_2_Web_Api.Migrations
                     b.HasOne("Project_2_Web_API.Models.Area", "Area")
                         .WithMany("StaffUsers")
                         .HasForeignKey("AreaId");
+
+                    b.HasOne("Project_2_Web_Api.Models.Notification", null)
+                        .WithMany("StaffUsers")
+                        .HasForeignKey("NotificationId");
 
                     b.HasOne("Project_2_Web_API.Models.Position", "Position")
                         .WithMany()
@@ -646,6 +762,10 @@ namespace Project_2_Web_Api.Migrations
                     b.HasOne("Project_2_Web_API.Models.StaffUser", "StaffUser")
                         .WithMany()
                         .HasForeignKey("CreateBy");
+
+                    b.HasOne("Project_2_Web_Api.Models.Notification", null)
+                        .WithMany("User")
+                        .HasForeignKey("NotificationId");
 
                     b.HasOne("Project_2_Web_API.Models.Position", "Position")
                         .WithMany("Users")
@@ -708,6 +828,15 @@ namespace Project_2_Web_Api.Migrations
                     b.Navigation("GrantPermissions");
                 });
 
+            modelBuilder.Entity("Project_2_Web_Api.Models.Notification", b =>
+                {
+                    b.Navigation("Distributors");
+
+                    b.Navigation("StaffUsers");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Project_2_Web_API.Models.Position", b =>
                 {
                     b.Navigation("Users");
@@ -726,6 +855,10 @@ namespace Project_2_Web_Api.Migrations
             modelBuilder.Entity("Project_2_Web_API.Models.TaskForVisit", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("PhotoPathAssigned");
+
+                    b.Navigation("PhotoPathReporting");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.User", b =>

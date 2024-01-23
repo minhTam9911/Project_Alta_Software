@@ -23,6 +23,8 @@ public partial class StaffUser
 	public DateTime CreatedDate { get; set; }
 	[ForeignKey("PositionId")]
 	public virtual Position? Position { get; set; }
+	public string? PasswordResetToken { get; set; }
+	public DateTime? ResetTokenExpires { get; set; }
 	public bool? IsStatus { get; set; }
 	public virtual Area? Area { get; set; }	
 	public virtual ICollection<StaffUser>? StaffSuperior { get; set; } = new List<StaffUser>();

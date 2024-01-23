@@ -211,15 +211,7 @@ public class DistributorController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
-			return Ok(await distributorService.FindById(User?.Identity?.Name));
+			return Ok(await userServiceAccessor.GetByMe());
 		}
 		catch (Exception ex)
 		{

@@ -8,9 +8,9 @@ public interface TaskForVisitService
 	Task<IActionResult> Create(TaskForVisitDTO taskForVisitDTO);
 	Task<IActionResult> FindAll();
 	Task<IActionResult> FindById(int id);
-	Task<IActionResult> UploadFile(IFormFile fileAssigned, IFormFile fileReport);
+	Task<IActionResult> UploadFile(int id, IFormFile[] fileAssigned, IFormFile[] fileReport);
 	Task<IActionResult> TaskForMe();
 	Task<IActionResult> DetailTask(int id);
-	Task<IActionResult> UploadFileTaskForMe(int id, IFormFile fileReport, string status);
+	Task<IActionResult> UploadFileTaskForMe(int id, IFormFile[] fileReport, string status);
 
 }

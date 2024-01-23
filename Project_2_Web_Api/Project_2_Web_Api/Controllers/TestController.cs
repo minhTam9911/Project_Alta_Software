@@ -13,6 +13,9 @@ public class TestController : ControllerBase
 	private readonly UserServiceAccessor userServiceAccessor;
 	private readonly PositionService positionService;
 	private readonly StaffUserService staffUserService;
+	private static bool _isRun = false;
+	private static bool _isRun1 = false;
+	private static bool _isRun2 = false;
 	public TestController(PositionGroupService positionGroupService, UserServiceAccessor userServiceAccessor, PositionService positionService, StaffUserService staffUserService)
 	{
 		this.positionGroupService = positionGroupService;
@@ -25,8 +28,16 @@ public class TestController : ControllerBase
 	[HttpGet("test0")]
 	public async Task<IActionResult> Test()
 	{
-		var data = new PositionGroupDTO { Name = "System" };
-		return await positionGroupService.Create(data);
+		if (!_isRun)
+		{
+			_isRun = true;
+			var data = new PositionGroupDTO { Name = "System" };
+			return await positionGroupService.Create(data);
+		}
+		else
+		{
+			return Unauthorized();
+		}
 
 	}
 	[Produces("application/json")]
@@ -34,8 +45,12 @@ public class TestController : ControllerBase
 	[HttpGet("test1")]
 	public async Task<IActionResult> Test1()
 	{
-		var data = new PositionDTO { Name = "Administrator", PositionGroupId = 1 };
-		return await positionService.Create(data);
+		if (!_isRun1)
+		{
+			var data = new PositionDTO { Name = "Administrator", PositionGroupId = 1 };
+			return await positionService.Create(data);
+		}
+		return Unauthorized();
 
 	}
 
@@ -44,9 +59,12 @@ public class TestController : ControllerBase
 	[HttpGet("test2/{email}")]
 	public async Task<IActionResult> Test2(string email)
 	{
-	var data = new StaffUserDTO { Fullname = "Supper admin", Email = email, PositionId = 1,IsStatus = false , StaffSuperiorId = null, StaffInteriorId = null};
-	return await staffUserService.Create(data);
-	
+		if (!_isRun2)
+		{
+			var data = new StaffUserDTO { Fullname = "Supper admin", Email = email, PositionId = 1, IsStatus = false, StaffSuperiorId = null, StaffInteriorId = null };
+			return await staffUserService.Create(data);
+		}
+		return Unauthorized();
 	}
-
+	
 }

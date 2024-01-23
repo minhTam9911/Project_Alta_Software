@@ -20,58 +20,6 @@ public class PositionGroupServiceImpl : PositionGroupService
 		this.mapper = mapper;
 	}
 
-	/*public async Task<IActionResult> Create(string positionGroup, string role)
-	{
-		var positionGroupGet = new PositionGroup();
-		var modelState = httpContextAccessor.HttpContext?.Items["MS_ModelState"] as ModelStateDictionary;
-		try
-		{
-			if (positionGroup == null)
-			{
-				return new BadRequestObjectResult(new { msg = "Data request is null!!!" });
-			}
-			else
-			{
-				positionGroupGet = JsonConvert.DeserializeObject<PositionGroup>(positionGroup);
-				if (modelState != null && !modelState.IsValid)
-				{
-					return new BadRequestObjectResult(modelState);
-				}
-				else
-				{
-					if (role.ToLower() != "administrator" && role.ToLower() != "owner")
-					{
-						return new UnauthorizedObjectResult(new { msg = "You do not have sufficient permissions to access this feature" });
-					}
-					else
-					{
-						if (db.PositionGroups.FirstOrDefault(x => x.Name.ToLower() == positionGroupGet.Name.ToLower()) != null)
-						{
-							return new BadRequestObjectResult(new { msg = "Name Position Group already exist!" });
-						}
-						positionGroupGet.Created = DateTime.Now;
-						db.PositionGroups.Add(positionGroupGet);
-						int check = await db.SaveChangesAsync();
-						if (check > 0)
-						{
-							return new OkObjectResult(new { msg = "Added successfully!" });
-						}
-						else
-						{
-							return new BadRequestObjectResult(new { msg = "Added failure!" });
-						}
-
-					}
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			return new BadRequestObjectResult(new { msg = ex.Message });
-		}
-	}
-*/
-	
 	public async Task<IActionResult> Delete(string id)
 	{
 		try

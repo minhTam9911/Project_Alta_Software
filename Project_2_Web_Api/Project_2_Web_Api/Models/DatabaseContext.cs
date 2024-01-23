@@ -24,4 +24,5 @@ public class DatabaseContext : DbContext
 	public DbSet<TaskForVisit> TaskForVisit { get; set; }
 	public DbSet<Visit> Visits { get; set; }
 	public DbSet<ApiToken> ApiTokens { get; set; }
+	public DbSet<Notification> Notifications { get; set; }
 }

@@ -82,8 +82,11 @@ public class UserServiceAccessorImpl : UserServiceAccessor
 	{
 		try
 		{
-			if (_httpContextAccessor.HttpContext != null)
+
+			
+			if (_httpContextAccessor.HttpContext!=null)
 			{
+				var id = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name);
 				var role = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
 				if (role.ToLower() == "other department" || role.ToLower() == "guest")
 				{
@@ -114,6 +117,8 @@ public class UserServiceAccessorImpl : UserServiceAccessor
 	{
 		try
 		{
+			
+
 			if (_httpContextAccessor.HttpContext != null)
 			{
 				var role = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
@@ -183,7 +188,8 @@ public class UserServiceAccessorImpl : UserServiceAccessor
 		try{
 			if (_httpContextAccessor.HttpContext != null)
 			{
-				var role = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Role);
+
+				var role = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Role);
 				if (role.ToLower() == "other department" || role.ToLower() == "guest")
 				{
 					return Task.FromResult(false);
@@ -294,5 +300,61 @@ public class UserServiceAccessorImpl : UserServiceAccessor
 			return new { error = ex.Message };
 		}
 		
+	}
+
+	public Task<Guid?> GetById()
+	{
+		try
+		{
+			if (_httpContextAccessor.HttpContext != null)
+			{
+				return Task.FromResult<Guid?>(Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name)));
+			}
+			else
+			{
+				return Task.FromResult<Guid?>(null);
+			}
+		}
+		catch (Exception ex)
+		{
+			return Task.FromResult<Guid?>(null);
+		}
+	}
+	public async Task<string?> GetByName(Guid? id)
+	{
+		try
+		{
+			if (_httpContextAccessor.HttpContext != null)
+			{
+				var data = await db.StaffUsers.FindAsync(id);
+				if(data != null)
+				{
+					return data.Fullname;
+				}
+				var data2 = await db.Users.FindAsync(id);
+				if (data2 != null)
+				{
+					return data2.FullName;
+				}
+				var data3 = await db.Distributors.FindAsync(id);
+				if (data3 != null)
+				{
+					return data3.Name;
+				}
+				else
+				{
+					return null;
+				}
+
+			}
+			else
+			{
+				return null;
+			}
+		}
+		catch (Exception ex)
+		{
+			return null;
+		}
 	}
 }

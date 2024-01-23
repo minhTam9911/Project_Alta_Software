@@ -12,4 +12,6 @@ public interface UserServiceAccessor
 	Task<bool> IsSystem();
 	Task<bool> IsSales();
 	Task<dynamic> GetByMe();
+	Task<Guid?> GetById();
+	Task<string?> GetByName(Guid? id);
 }

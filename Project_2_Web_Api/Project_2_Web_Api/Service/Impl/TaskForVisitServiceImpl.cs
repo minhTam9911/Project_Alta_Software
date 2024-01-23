@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Project_2_Web_Api.DTO;
+using Project_2_Web_Api.Helpers;
 using Project_2_Web_API.Models;
+using System;
 using System.Security.Claims;
 
 namespace Project_2_Web_Api.Service.Impl;
@@ -16,13 +18,15 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 	private readonly IMapper mapper;
 	private IConfiguration configuration;
 	private UserServiceAccessor userServiceAccessor;
-	public TaskForVisitServiceImpl(DatabaseContext db, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper, UserServiceAccessor userServiceAccessor)
+	private IWebHostEnvironment webHostEnvironment;
+	public TaskForVisitServiceImpl(DatabaseContext db, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper, UserServiceAccessor userServiceAccessor, IWebHostEnvironment webHostEnvironment)
 	{
 		this.mapper = mapper;
 		this.configuration = configuration;
 		_httpContextAccessor = httpContextAccessor;
 		this.db = db;
 		this.userServiceAccessor = userServiceAccessor;
+		this.webHostEnvironment = webHostEnvironment;
 	}
 
 	public  async Task<IActionResult> Create(TaskForVisitDTO taskForVisitDTO)
@@ -169,7 +173,14 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 						description = x.Description,
 						startDate = x.StartDate,
 						endDate = x.EndDate,
-
+						photoPathReporting = x.PhotoPathReporting == null? null : x.PhotoPathReporting.Select(x => new
+						{
+							file = configuration["BaseUrl"] + "TaskForVisit/" + x.Path
+						}),
+						photoPathAssigned = x.PhotoPathAssigned == null ? null : x.PhotoPathAssigned.Select(x => new
+						{
+							file = configuration["BaseUrl"] + "TaskForVisit/" + x.Path
+						})
 					}).ToListAsync()
 					);
 				}
@@ -206,9 +217,86 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		}
 	}
 
-	public Task<IActionResult> FindById(int id)
+	public async Task<IActionResult> FindById(int id)
 	{
-		throw new NotImplementedException();
+		try
+		{
+			if (await db.TaskForVisit.AnyAsync() == false || await db.TaskForVisit.FindAsync(id) == null )
+			{
+				return new OkObjectResult(new { error = "Data is null !" });
+			}
+			else
+			{
+				if (await userServiceAccessor.IsGuest())
+				{
+					return new UnauthorizedResult();
+				}
+				else if (await userServiceAccessor.IsDistributor())
+				{
+					return new UnauthorizedResult();
+				}
+				else if (await userServiceAccessor.IsSales())
+				{
+					return new OkObjectResult(
+					await db.TaskForVisit.Where(x => x.AssignedStaffUserId == Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name))).Select(x => new
+					{
+						id = x.Id,
+						title = x.Title,
+						assignedStaffUser = new
+						{
+							id = x.AssignedStaffUserId,
+							name = x.StaffUserAssignee.Fullname
+						},
+						reportStaffUser = new
+						{
+							id = x.ReportingStaffUserId,
+							name = x.StaffUserReposter.Fullname
+						},
+						description = x.Description,
+						startDate = x.StartDate,
+						endDate = x.EndDate,
+						photoPathReporting = x.PhotoPathReporting == null ? null : x.PhotoPathReporting.Select(x => new
+						{
+							file = configuration["BaseUrl"] + "TaskForVisit/" + x.Path
+						}),
+						photoPathAssigned = x.PhotoPathAssigned == null ? null : x.PhotoPathAssigned.Select(x => new
+						{
+							file = configuration["BaseUrl"] + "TaskForVisit/" + x.Path
+						})
+					}).ToListAsync()
+					);
+				}
+				else;
+				return new OkObjectResult(
+					await db.TaskForVisit.Where(x => x.AssignedStaffUserId == Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name))).Select(x => new
+					{
+						id = x.Id,
+						title = x.Title,
+						assignedStaffUser = new
+						{
+							id = x.AssignedStaffUserId,
+							name = x.StaffUserAssignee.Fullname
+						},
+						reportStaffUser = new
+						{
+							id = x.ReportingStaffUserId,
+							name = x.StaffUserReposter.Fullname
+						},
+						description = x.Description,
+						startDate = x.StartDate,
+						endDate = x.EndDate,
+
+					}).ToListAsync()
+					);
+			}
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult(new
+			{
+				error = ex.Message
+			});
+		}
 	}
 
 	public async Task<IActionResult> TaskForMe()
@@ -286,13 +374,88 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		}
 	}
 
-	public Task<IActionResult> UploadFile(IFormFile fileAssigned, IFormFile fileReport)
+	public async  Task<IActionResult> UploadFile(int id,IFormFile[] fileAssigned, IFormFile[] fileReport)
 	{
-		throw new NotImplementedException();
+		try
+		{
+			var data = await db.TaskForVisit.FindAsync(id);
+
+			if (data == null)
+			{
+				return new BadRequestObjectResult(new { error = "Id does not exist" });
+			}
+			foreach (var file in fileReport)
+			{
+				var fileName = FileHelper.generateFileName(file.FileName)!;
+				var path = Path.Combine(webHostEnvironment.WebRootPath, "TaskForVisit", fileName);
+				using (var fileStream = new FileStream(path, FileMode.Create))
+				{
+					file.CopyTo(fileStream);
+				}
+				data.PhotoPathReporting.Add(new PhotoPathReporting { Path = fileName }) ;
+			}
+			foreach (var file in fileAssigned)
+			{
+				var fileName = FileHelper.generateFileName(file.FileName);
+				var path = Path.Combine(webHostEnvironment.WebRootPath, "TaskForVisit", fileName);
+				using (var fileStream = new FileStream(path, FileMode.Create))
+				{
+					file.CopyTo(fileStream);
+				}
+				data.PhotoPathAssigned.Add(new PhotoPathAssigned { Path = fileName});
+			}
+			db.Entry(data).State = EntityState.Modified;
+			if (await db.SaveChangesAsync() > 0)
+			{
+				return new OkObjectResult(new { msg = "Upload file success" });
+			}
+			else
+			{
+				return new BadRequestObjectResult(new { msg = "Upload file fail" });
+			}
+
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult(new { error = ex.Message });
+		}
 	}
 
-	public Task<IActionResult> UploadFileTaskForMe(int id, IFormFile fileReport, string status)
+	public async Task<IActionResult> UploadFileTaskForMe(int id, IFormFile[] fileReport, string status)
 	{
-		throw new NotImplementedException();
+		try
+		{
+			var data = await db.TaskForVisit.FindAsync(id);
+			if (data == null)
+			{
+				return  new BadRequestObjectResult(new { error = "Id does not exist" });
+			}
+			foreach (var file in fileReport)
+			{
+				var fileName = FileHelper.generateFileName(file.FileName);
+				var path = Path.Combine(webHostEnvironment.WebRootPath, "TaskForVisit", fileName);
+				using (var fileStream = new FileStream(path, FileMode.Create))
+				{
+					file.CopyTo(fileStream);
+				}
+				data.PhotoPathReporting.Add(new PhotoPathReporting { Path = fileName});
+			}
+			data.Status = status;
+			db.Entry(data).State = EntityState.Modified;
+			if(await db.SaveChangesAsync() > 0)
+			{
+				return new OkObjectResult(new { msg = "Upload file success" });
+			}
+			else
+			{
+				return new BadRequestObjectResult(new { msg = "Upload file fail" });
+			}
+			
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult(new { error = ex.Message });
+		}
+
 	}
 }

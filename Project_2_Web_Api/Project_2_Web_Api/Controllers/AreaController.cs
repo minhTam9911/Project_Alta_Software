@@ -26,12 +26,13 @@ public class AreaController : ControllerBase
 
 
 	#region
-	/*[HttpGet("demo")]
-	[Authorize]
-	public IActionResult demo()
-	{
-		return Ok(new { id = Guid.NewGuid(), password = BCrypt.Net.BCrypt.HashPassword("abc123"), date = DateTime.Now, token = User?.Identity.Name });
-	}*/
+	/*	[HttpGet("demo")]
+		[Authorize]
+		public IActionResult demo()
+		{
+			return Ok(new { id = Guid.NewGuid(), password = BCrypt.Net.BCrypt.HashPassword("abc123"), date = DateTime.Now, token = User?.FindFirstValue(ClaimTypes.Role)
+		});
+		}*/
 	#endregion
 
 
@@ -44,18 +45,7 @@ public class AreaController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await areaService.FindAll());
 		}catch(Exception ex)
 		{
@@ -70,18 +60,7 @@ public class AreaController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await areaService.FindById(id));
 		}
 		catch (Exception ex)
@@ -97,18 +76,7 @@ public class AreaController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await areaService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -122,18 +90,7 @@ public class AreaController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody] AreaDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await areaService.Create(request);
 	}
 
@@ -219,18 +176,6 @@ public class AreaController : ControllerBase
 	[HttpPut("update/{id}")]
 	public async Task<IActionResult> Update(int id, [FromQuery(Name = "name-area")] string nameArea)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
 		return await areaService.Update(id, nameArea);
 	}
 
@@ -239,18 +184,6 @@ public class AreaController : ControllerBase
 	[HttpDelete("delete/{id}")]
 	public async Task<IActionResult> Delete(int id)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
 		return await areaService.Delete(id);
 	}
 }

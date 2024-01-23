@@ -2566,6 +2566,25 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
         }
+      },
+      "Twilio/6.16.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.IdentityModel.Tokens": "6.19.0",
+          "Newtonsoft.Json": "13.0.1",
+          "System.Collections.Specialized": "4.3.0",
+          "System.IdentityModel.Tokens.Jwt": "6.19.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/Twilio.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Twilio.dll": {
+            "related": ".xml"
+          }
+        }
       }
     }
   },
@@ -8127,6 +8146,25 @@
         "system.xml.xmldocument.4.3.0.nupkg.sha512",
         "system.xml.xmldocument.nuspec"
       ]
+    },
+    "Twilio/6.16.1": {
+      "sha512": "3qPUB5m5jTHgHs87Gwr3S9GwCqv6Rlm/VsDX9UHd7ZpqSGNPdsK3N8fdeYuJKxeqjtoKKn1a5qawwBtDiHIcOg==",
+      "type": "package",
+      "path": "twilio/6.16.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net35/Twilio.dll",
+        "lib/net35/Twilio.xml",
+        "lib/net451/Twilio.dll",
+        "lib/net451/Twilio.xml",
+        "lib/netstandard1.4/Twilio.dll",
+        "lib/netstandard1.4/Twilio.xml",
+        "lib/netstandard2.0/Twilio.dll",
+        "lib/netstandard2.0/Twilio.xml",
+        "twilio.6.16.1.nupkg.sha512",
+        "twilio.nuspec"
+      ]
     }
   },
   "projectFileDependencyGroups": {
@@ -8144,7 +8182,8 @@
       "Newtonsoft.Json >= 13.0.3",
       "Swashbuckle.AspNetCore >= 6.5.0",
       "Swashbuckle.AspNetCore.Filters >= 6.1.0",
-      "System.IdentityModel.Tokens.Jwt >= 6.33.0"
+      "System.IdentityModel.Tokens.Jwt >= 6.33.0",
+      "Twilio >= 6.16.1"
     ]
   },
   "packageFolders": {
@@ -8245,6 +8284,10 @@
           "System.IdentityModel.Tokens.Jwt": {
             "target": "Package",
             "version": "[6.33.0, )"
+          },
+          "Twilio": {
+            "target": "Package",
+            "version": "[6.16.1, )"
           }
         },
         "imports": [

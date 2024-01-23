@@ -65,15 +65,7 @@ public class StaffUserServiceImpl : StaffUserService
 				staffUser.CreatedDate = DateTime.Now;
 				var password = RandomHelper.RandomDefaultPassword(12);
 				var mailHelper = new MailHelper(configuration);
-
-				var content = "<h1>CDExcellent</h1><br><br>" +
-							"<h2>Hello " + staffUser.Fullname + "!</h2><br>" +
-							"<h3>CDExcellent is glad you signed up.</h3><br>" +
-							"<h2>=>Your account: " + staffUser.Email + "</h2><br>" +
-							"<h2>=>Password: " + password + "</h2><br>" +
-							"<h3>This is only a temporary password, please log in and change it.</h3><br>" +
-							"<h2>Thank you very much!</h2>";
-				var check = mailHelper.Send(configuration["Gmail:Username"], staffUser.Email, "Welcome " + staffUser.Fullname + " to join CDExcellent", content);
+				var check = mailHelper.Send(configuration["Gmail:Username"], staffUser.Email, "Welcome " + staffUser.Fullname + " to join CDExcellent", MailHelper.HtmlNewAccount(staffUser.Fullname,staffUser.Email,password));
 				if (!check)
 				{
 					return new BadRequestObjectResult(new { error = "Email sending failed." });

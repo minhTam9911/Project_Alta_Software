@@ -22,44 +22,33 @@ public class SupportAccountController : ControllerBase
 	[Authorize]
 	public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
 	{
-		string? id = User?.Identity.Name;
-		return await supportAccountService.ChangePassword(id, request.oldPassword, request.newPassword);
+		return await supportAccountService.ChangePassword(request.oldPassword, request.newPassword);
 	}
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("forgot-password")]
-	public async Task<IActionResult> ForgotPassword([FromBody] VerifyCode request)
+	public async Task<IActionResult> ForgotPassword([FromQuery(Name = "email")] string email)
 	{
-		if (User?.Identity.Name != null)
-		{
-			return Unauthorized();
-		}
-		return await supportAccountService.ForgotPassword(request.email);
+		
+		return await supportAccountService.ForgotPassword(email);
 	}
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
-	[HttpPut("verify-code")]
-	public async Task<IActionResult> VerifyCode([FromBody] VerifyCode request)
+	[HttpPut("verify")]
+	public async Task<IActionResult> VerifyCode(ForgotPasswordRequest request)
 	{
-		if (User?.Identity.Name != null)
-		{
-			return Unauthorized();
-		}
-		return await supportAccountService.VerifySecurityCode(request.email, request.code);
+		
+		return await supportAccountService.VerifySecurityCode(request);
 	}
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("change-forgot-password")]
-	public async Task<IActionResult> ChangeForgotPassword([FromBody] ChangePasswordRequest request)
+	public async Task<IActionResult> ChangeForgotPassword([FromBody] NewPasswordRequest request)
 	{
-		if (User?.Identity.Name != null)
-		{
-			return Unauthorized();
-		}
-		return await supportAccountService.ChangeForgotPassword(request.email, request.newPassword);
+		return await supportAccountService.ChangeForgotPassword(request);
 	}
 
 	

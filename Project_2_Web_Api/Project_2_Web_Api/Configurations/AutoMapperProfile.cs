@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Project_2_Web_Api.DTO;
+using Project_2_Web_Api.Models;
 using Project_2_Web_API.Models;
 
 namespace Project_2_Web_Api.Configurations;
@@ -27,6 +28,12 @@ public class AutoMapperProfile : Profile
 		CreateMap<Visit, VisitDTO>();
 		CreateMap<TaskForVisitDTO, TaskForVisit>();
 		CreateMap<TaskForVisit, TaskForVisitDTO>();
+		CreateMap<CommentDTO, Comment>();
+		CreateMap<Comment, CommentDTO>();
+		CreateMap<PostDTO, Post>();
+		CreateMap<Post, PostDTO>();
+		CreateMap<NotificationDTO, Notification>();
+		CreateMap<Notification, NotificationDTO>();
 	}
 
 }

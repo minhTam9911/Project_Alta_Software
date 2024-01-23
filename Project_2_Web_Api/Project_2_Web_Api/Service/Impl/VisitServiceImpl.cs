@@ -41,22 +41,24 @@ public class VisitServiceImpl : VisitService
 			{
 				if(await userServiceAccessor.IsGuest() || await userServiceAccessor.IsDistributor() || await userServiceAccessor.IsSales())
 				{
-					if (await userServiceAccessor.CheckPermission("Create new visit plan")) ;
-					else
-					{
+					if (!await userServiceAccessor.CheckPermission("Create new visit plan")) {
 						return new UnauthorizedResult();
 					}
 				}
 				visit.Status = "Chưa Viếng Thăm";
 				visit.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
 				var distributor = await db.Distributors.FindAsync(visit.DistributorId);
+				if(distributor == null)
+				{
+					return new BadRequestObjectResult(new {error = "Id Distributor does not exist"});
+				}
 				var nameCreateBy = await db.StaffUsers.FindAsync(visit.CreateBy);
 				var mailHelper = new MailHelper(configuration);
-				var content = "<h2>CDExcellent</h2><br><br>" +
-							"<h2>Dear " + distributor.Name + "!</h2><br>" +
+				var content = "<h2>CDExcellent</h2><br>" +
+							"<h2>Dear " + distributor.Name + "!</h2>" +
 						"<h3>CDExcellent would like to invite "+distributor.Name+" to attend a visit to the company on "+visit.Calendar.Value.ToString("dd-MM-yyyy")+" at "+visit.Time+".</h3>" +
 						"<h3>This visit is intended to "+visit.PurposeOfVisit+ " We would like to have the opportunity to meet, discuss and learn more about"+distributor.Name +"</h3>" +
-						"<h2>We look forward to welcoming [Recipient's name] to your visit!</h2>" +
+						"<h2>We look forward to welcoming "+distributor.Name+" to your visit!</h2>" +
 						"<h2>Best regards!</h2>" +
 						"<h3>Sender's name: "+ nameCreateBy.Fullname+ "</h3>" +
 						"<h3>Position: "+nameCreateBy.Position.Name+"</h3>";
@@ -92,6 +94,10 @@ public class VisitServiceImpl : VisitService
 			if( await db.Visits.AnyAsync() == false)
 			{
 				return new OkObjectResult(new { error = "Data is null !" });
+			}
+			if(await userServiceAccessor.IsGuest() || await userServiceAccessor.IsDistributor())
+			{
+				return new UnauthorizedResult();
 			}
 			else
 			{
@@ -142,7 +148,7 @@ public class VisitServiceImpl : VisitService
 			{
 				return new BadRequestObjectResult(new { error = "Id does not exist!" });
 			}
-			else
+			if(await userServiceAccessor.IsSystem())
 			{
 				data.CreateBy = null;
 				data.Distributor = null;
@@ -159,6 +165,10 @@ public class VisitServiceImpl : VisitService
 				{
 					return new BadRequestObjectResult(new { error = "Delete Failed!" });
 				}
+			}
+			else
+			{
+				return new UnauthorizedResult();
 			}
 		}
 		catch (Exception ex)
@@ -289,8 +299,7 @@ public class VisitServiceImpl : VisitService
 			{
 				if(await userServiceAccessor.IsGuest() || await userServiceAccessor.IsDistributor() || await userServiceAccessor.IsSales())
 				{
-					if (await userServiceAccessor.CheckPermission("View all visit plans")) ;
-					else
+					if (! await userServiceAccessor.CheckPermission("View all visit plans")) 
 					{
 						return new UnauthorizedResult();
 					}
@@ -500,7 +509,7 @@ public class VisitServiceImpl : VisitService
 			{
 				return new OkObjectResult(
 					await db.Visits.Where(x=>
-					x.Status.ToLower()!="Đã Viếng thăm".ToLower() && x.Status.ToLower()!="Đã Hủy".ToLower() && x.Calendar >= DateTime.Now)
+					(x.Status.ToLower()!="Đã Viếng thăm".ToLower() || x.Status.ToLower()!="Đã Hủy".ToLower()) && x.Calendar >= DateTime.Now)
 					.Select(x => new
 					{
 						id = x.Id,

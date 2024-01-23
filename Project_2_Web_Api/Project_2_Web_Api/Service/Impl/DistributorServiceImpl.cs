@@ -17,9 +17,11 @@ public class DistributorServiceImpl : DistributorService
 	private readonly IHttpContextAccessor _httpContextAccessor;
 	private readonly IMapper mapper;
 	private IConfiguration configuration;
-	public DistributorServiceImpl(DatabaseContext db, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+	private readonly UserServiceAccessor userServiceAccessor;
+	public DistributorServiceImpl(DatabaseContext db,UserServiceAccessor userServiceAccessor, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper)
 	{
 		this.mapper = mapper;
+		this.userServiceAccessor = userServiceAccessor;
 		this.configuration = configuration;
 		_httpContextAccessor = httpContextAccessor;
 		this.db = db;
@@ -43,80 +45,80 @@ public class DistributorServiceImpl : DistributorService
 			}
 			else
 			{
-				if (await db.Users.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
+				if (await userServiceAccessor.CheckPermission("Create new distributor") || await userServiceAccessor.IsSystem())
 				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.Positions.FindAsync(distributor.PositionId) == null)
-				{
-					return new BadRequestObjectResult(new { error = "Position not exist!!" });
-				}
-				var checkPosition = await db.Positions.FindAsync(distributor.PositionId);
-				if (checkPosition.Name.ToLower() != "distributor - om/tl")
-				{
-					return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
-				}
-				distributor.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
-				distributor.CreatedDate = DateTime.Now;
-				distributor.PhotoAvatar = "avatar-default-icon.png";
-				var password = RandomHelper.RandomDefaultPassword(12);
-				var mailHelper = new MailHelper(configuration);
-				Guid idSaleManagement;
-				bool parseGuid1 = Guid.TryParse(distributorDTO.IdSaleManagement, out idSaleManagement);
-				
-				if (parseGuid1 == false)
-				{
-					return new BadRequestObjectResult(new { error = "Id Sale Management invalid !!" });
-				}
-				if (await db.StaffUsers.FindAsync(idSaleManagement) == null)
-				{
-					return new BadRequestObjectResult(new { error = "Id Sale Management not exist !!" });
-				}
-				if (!distributorDTO.IdSales.IsNullOrEmpty())
-				{
-					Guid idSales;
-					bool parseGuid2 = Guid.TryParse(distributorDTO.IdSales, out idSales);
+					if (await db.Users.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
+					{
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					}
+					if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
+					{
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					}
+					if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
+					{
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+					}
+					if (await db.Positions.FindAsync(distributor.PositionId) == null)
+					{
+						return new BadRequestObjectResult(new { error = "Position not exist!!" });
+					}
+					var checkPosition = await db.Positions.FindAsync(distributor.PositionId);
+					if (checkPosition.Name.ToLower() != "distributor - om/tl")
+					{
+						return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
+					}
+					distributor.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
+					distributor.CreatedDate = DateTime.Now;
+					distributor.PhotoAvatar = "avatar-default-icon.png";
+					var password = RandomHelper.RandomDefaultPassword(12);
+					var mailHelper = new MailHelper(configuration);
+					Guid idSaleManagement;
+					bool parseGuid1 = Guid.TryParse(distributorDTO.IdSaleManagement, out idSaleManagement);
+
 					if (parseGuid1 == false)
 					{
-						return new BadRequestObjectResult(new { error = "Id Sales invalid !!" });
+						return new BadRequestObjectResult(new { error = "Id Sale Management invalid !!" });
 					}
-					if (await db.StaffUsers.FindAsync(idSales) == null)
+					if (await db.StaffUsers.FindAsync(idSaleManagement) == null)
 					{
-						return new BadRequestObjectResult(new { error = "Id Sales not exist !!" });
+						return new BadRequestObjectResult(new { error = "Id Sale Management not exist !!" });
 					}
-					distributor.SalesId = idSales;
-				}
-				distributor.SaleManagementId = idSaleManagement;
-				var content = "<h2>CDExcellent</h2><br><br>" +
-							"<h2>Hello " + distributor.Name + "!</h2><br>" +
-						"<h3>CDExcellent is glad you signed up.</h3><br>" +
-						"<h2>=>Your account: " + distributor.Email + "</h2><br>" +
-						"<h2>=>Password: " + password + "</h2><br>" +
-						"<h3>This is only a temporary password, please log in and change it.</h3><br>" +
-						"<h2>Thank you very much!</h2>";
-				var check = mailHelper.Send(configuration["Gmail:Username"], distributor.Email, "Welcome " + distributor.Name + " to join CDExcellent", content);
-				if (!check)
-				{
-					return new BadRequestObjectResult(new { error = "Email sending failed." });
-				}
-				var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
-				distributor.Password = hashPassword;
-				db.Distributors.Add(distributor);
-				if (await db.SaveChangesAsync() > 0)
-				{
-					return new OkObjectResult(new { msg = "Added successfully !!" });
+					if (!distributorDTO.IdSales.IsNullOrEmpty())
+					{
+						Guid idSales;
+						bool parseGuid2 = Guid.TryParse(distributorDTO.IdSales, out idSales);
+						if (parseGuid1 == false)
+						{
+							return new BadRequestObjectResult(new { error = "Id Sales invalid !!" });
+						}
+						if (await db.StaffUsers.FindAsync(idSales) == null)
+						{
+							return new BadRequestObjectResult(new { error = "Id Sales not exist !!" });
+						}
+						distributor.SalesId = idSales;
+					}
+					distributor.SaleManagementId = idSaleManagement;
+					var check = mailHelper.Send(configuration["Gmail:Username"], distributor.Email, "Welcome " + distributor.Name + " to join CDExcellent", MailHelper.HtmlNewAccount(distributor.Name, distributor.Email, password));
+					if (!check)
+					{
+						return new BadRequestObjectResult(new { error = "Email sending failed." });
+					}
+					var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
+					distributor.Password = hashPassword;
+					db.Distributors.Add(distributor);
+					if (await db.SaveChangesAsync() > 0)
+					{
+						return new OkObjectResult(new { msg = "Added successfully !!" });
+					}
+					else
+					{
+						return new BadRequestObjectResult(new { error = "Added failure !!" });
+					}
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Added failure !!" });
+					return new UnauthorizedResult();
 				}
 
 			}
@@ -146,75 +148,82 @@ public class DistributorServiceImpl : DistributorService
 			}
 			else
 			{
-				if (await db.Users.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
+				if (await userServiceAccessor.CheckPermission("Update detail distributor") || await userServiceAccessor.IsSystem())
 				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == distributor.Email && x.Id != idDistributor) != null)
-				{
-					return new BadRequestObjectResult(new { error = "Email already exist!!" });
-				}
-				if (await db.Positions.FindAsync(distributor.PositionId) == null)
-				{
-					return new BadRequestObjectResult(new { error = "Position not exist!!" });
-				}
-				var checkPosition = await db.Positions.FindAsync(distributor.PositionId);
-				if (checkPosition.Name.ToLower() != "distributor - om/tl")
-				{
-					return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
-				}
-				else
-				{
-					var data = await db.Distributors.FindAsync(idDistributor);
-					if(data == null)
+					if (await db.Users.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Id Distributor not exist!!" });
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
 					}
-					Guid idSaleManagement;
-					bool parseGuid1 = Guid.TryParse(distributorDTO.IdSaleManagement, out idSaleManagement);
-
-					if (parseGuid1 == false)
+					if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == distributor.Email) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Id Sale Management invalid !!" });
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
 					}
-					if(await db.StaffUsers.FindAsync(idSaleManagement) == null)
+					if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == distributor.Email && x.Id != idDistributor) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Id Sale Management not exist !!" });
+						return new BadRequestObjectResult(new { error = "Email already exist!!" });
 					}
-					if (distributorDTO.IdSales != null)
+					if (await db.Positions.FindAsync(distributor.PositionId) == null)
 					{
-						Guid idSales;
-						bool parseGuid2 = Guid.TryParse(distributorDTO.IdSales, out idSales);
-						if (parseGuid1 == false)
-						{
-							return new BadRequestObjectResult(new { error = "Id Sales invalid !!" });
-						}
-						if (await db.StaffUsers.FindAsync(idSales) == null)
-						{
-							return new BadRequestObjectResult(new { error = "Id Sales not exist !!" });
-						}
-						distributor.SalesId = idSales;
-						data.SalesId = distributor.SalesId;
+						return new BadRequestObjectResult(new { error = "Position not exist!!" });
 					}
-					distributor.SaleManagementId = idSaleManagement;
-					data.IsStatus = distributor.IsStatus;
-					data.Name = distributor.Name;
-					data.Email = distributor.Email;
-					data.PositionId = distributor.PositionId;
-					data.SaleManagementId = distributor.SaleManagementId;
-					db.Entry(data).State = EntityState.Modified;
-					if (await db.SaveChangesAsync() > 0)
+					var checkPosition = await db.Positions.FindAsync(distributor.PositionId);
+					if (checkPosition.Name.ToLower() != "distributor - om/tl")
 					{
-						return new OkObjectResult(new { msg = "Update successfully !!" });
+						return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Update failure !!" });
+						var data = await db.Distributors.FindAsync(idDistributor);
+						if (data == null)
+						{
+							return new BadRequestObjectResult(new { error = "Id Distributor not exist!!" });
+						}
+						Guid idSaleManagement;
+						bool parseGuid1 = Guid.TryParse(distributorDTO.IdSaleManagement, out idSaleManagement);
+
+						if (parseGuid1 == false)
+						{
+							return new BadRequestObjectResult(new { error = "Id Sale Management invalid !!" });
+						}
+						if (await db.StaffUsers.FindAsync(idSaleManagement) == null)
+						{
+							return new BadRequestObjectResult(new { error = "Id Sale Management not exist !!" });
+						}
+						if (distributorDTO.IdSales != null)
+						{
+							Guid idSales;
+							bool parseGuid2 = Guid.TryParse(distributorDTO.IdSales, out idSales);
+							if (parseGuid1 == false)
+							{
+								return new BadRequestObjectResult(new { error = "Id Sales invalid !!" });
+							}
+							if (await db.StaffUsers.FindAsync(idSales) == null)
+							{
+								return new BadRequestObjectResult(new { error = "Id Sales not exist !!" });
+							}
+							distributor.SalesId = idSales;
+							data.SalesId = distributor.SalesId;
+						}
+						distributor.SaleManagementId = idSaleManagement;
+						data.IsStatus = distributor.IsStatus;
+						data.Name = distributor.Name;
+						data.Email = distributor.Email;
+						data.PositionId = distributor.PositionId;
+						data.SaleManagementId = distributor.SaleManagementId;
+						db.Entry(data).State = EntityState.Modified;
+						if (await db.SaveChangesAsync() > 0)
+						{
+							return new OkObjectResult(new { msg = "Update successfully !!" });
+						}
+						else
+						{
+							return new BadRequestObjectResult(new { error = "Update failure !!" });
+						}
 					}
+				}
+				else
+				{
+					return new UnauthorizedResult();
 				}
 			}
 		}
@@ -230,26 +239,33 @@ public class DistributorServiceImpl : DistributorService
 		bool parseGuid = Guid.TryParse(id, out idDistributor);
 		try
 		{
-			if (parseGuid == false)
+			if (await userServiceAccessor.CheckPermission("Delete distributor") || await userServiceAccessor.IsSystem())
 			{
-				return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
-			}
-			if (await db.Distributors.FindAsync(idDistributor) == null)
-			{
-				return new BadRequestObjectResult(new { error = "Id Distributor does not exist!" });
-			}
-			else
-			{
-				db.Distributors.Remove(await db.Distributors.FindAsync(idDistributor));
-				var check = await db.SaveChangesAsync();
-				if (check > 0)
+				if (parseGuid == false)
 				{
-					return new OkObjectResult(new { msg = "Delete Successfully!" });
+					return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+				}
+				if (await db.Distributors.FindAsync(idDistributor) == null)
+				{
+					return new BadRequestObjectResult(new { error = "Id Distributor does not exist!" });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					db.Distributors.Remove(await db.Distributors.FindAsync(idDistributor));
+					var check = await db.SaveChangesAsync();
+					if (check > 0)
+					{
+						return new OkObjectResult(new { msg = "Delete Successfully!" });
+					}
+					else
+					{
+						return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					}
 				}
+			}
+			else
+			{
+				return new UnauthorizedResult();
 			}
 		}
 		catch (Exception ex)

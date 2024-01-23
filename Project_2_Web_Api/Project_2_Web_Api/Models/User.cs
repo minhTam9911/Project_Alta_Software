@@ -23,6 +23,8 @@ public partial class User
 	[Required]
 	public int? PositionId { get; set; }
 	public DateTime CreatedDate {  get; set; }
+	public string? PasswordResetToken { get; set; }
+	public DateTime? ResetTokenExpires { get; set; }
 	[ForeignKey("PositionId")]
 	public virtual Position? Position { get; set; }
 	[ForeignKey("CreateBy")]

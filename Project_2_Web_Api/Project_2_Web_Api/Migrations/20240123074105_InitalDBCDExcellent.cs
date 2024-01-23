@@ -52,6 +52,21 @@ namespace Project_2_Web_Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PositionGroups",
                 columns: table => new
                 {
@@ -101,8 +116,11 @@ namespace Project_2_Web_Api.Migrations
                     PhotoAvatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PositionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PasswordResetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResetTokenExpires = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsStatus = table.Column<bool>(type: "bit", nullable: true),
-                    AreaId = table.Column<int>(type: "int", nullable: true)
+                    AreaId = table.Column<int>(type: "int", nullable: true),
+                    NotificationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -111,6 +129,11 @@ namespace Project_2_Web_Api.Migrations
                         name: "FK_StaffUsers_Areas_AreaId",
                         column: x => x.AreaId,
                         principalTable: "Areas",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_StaffUsers_Notifications_NotificationId",
+                        column: x => x.NotificationId,
+                        principalTable: "Notifications",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_StaffUsers_Positions_PositionId",
@@ -136,9 +159,12 @@ namespace Project_2_Web_Api.Migrations
                     IsStatus = table.Column<bool>(type: "bit", nullable: true),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PhotoAvatar = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PasswordResetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResetTokenExpires = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PositionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AreaId = table.Column<int>(type: "int", nullable: true)
+                    AreaId = table.Column<int>(type: "int", nullable: true),
+                    NotificationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -147,6 +173,11 @@ namespace Project_2_Web_Api.Migrations
                         name: "FK_Distributors_Areas_AreaId",
                         column: x => x.AreaId,
                         principalTable: "Areas",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Distributors_Notifications_NotificationId",
+                        column: x => x.NotificationId,
+                        principalTable: "Notifications",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Distributors_Positions_PositionId",
@@ -231,7 +262,6 @@ namespace Project_2_Web_Api.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -267,7 +297,10 @@ namespace Project_2_Web_Api.Migrations
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     PositionId = table.Column<int>(type: "int", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AreaId = table.Column<int>(type: "int", nullable: true)
+                    PasswordResetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResetTokenExpires = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    AreaId = table.Column<int>(type: "int", nullable: true),
+                    NotificationId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -276,6 +309,11 @@ namespace Project_2_Web_Api.Migrations
                         name: "FK_Users_Areas_AreaId",
                         column: x => x.AreaId,
                         principalTable: "Areas",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Users_Notifications_NotificationId",
+                        column: x => x.NotificationId,
+                        principalTable: "Notifications",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Users_Positions_PositionId",
@@ -348,6 +386,44 @@ namespace Project_2_Web_Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PhotoPathAssigned",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TaskForVisitId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PhotoPathAssigned", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PhotoPathAssigned_TaskForVisit_TaskForVisitId",
+                        column: x => x.TaskForVisitId,
+                        principalTable: "TaskForVisit",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PhotoPathReporting",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Path = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TaskForVisitId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PhotoPathReporting", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PhotoPathReporting_TaskForVisit_TaskForVisitId",
+                        column: x => x.TaskForVisitId,
+                        principalTable: "TaskForVisit",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GrantPermissions",
                 columns: table => new
                 {
@@ -395,6 +471,11 @@ namespace Project_2_Web_Api.Migrations
                 column: "CreateBy");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Distributors_NotificationId",
+                table: "Distributors",
+                column: "NotificationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Distributors_PositionId",
                 table: "Distributors",
                 column: "PositionId");
@@ -425,6 +506,16 @@ namespace Project_2_Web_Api.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PhotoPathAssigned_TaskForVisitId",
+                table: "PhotoPathAssigned",
+                column: "TaskForVisitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PhotoPathReporting_TaskForVisitId",
+                table: "PhotoPathReporting",
+                column: "TaskForVisitId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Positions_PositionGroupId",
                 table: "Positions",
                 column: "PositionGroupId");
@@ -438,6 +529,11 @@ namespace Project_2_Web_Api.Migrations
                 name: "IX_StaffUsers_AreaId",
                 table: "StaffUsers",
                 column: "AreaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StaffUsers_NotificationId",
+                table: "StaffUsers",
+                column: "NotificationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StaffUsers_PositionId",
@@ -468,6 +564,11 @@ namespace Project_2_Web_Api.Migrations
                 name: "IX_Users_CreateBy",
                 table: "Users",
                 column: "CreateBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_NotificationId",
+                table: "Users",
+                column: "NotificationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_PositionId",
@@ -505,6 +606,12 @@ namespace Project_2_Web_Api.Migrations
                 name: "Medias");
 
             migrationBuilder.DropTable(
+                name: "PhotoPathAssigned");
+
+            migrationBuilder.DropTable(
+                name: "PhotoPathReporting");
+
+            migrationBuilder.DropTable(
                 name: "Posts");
 
             migrationBuilder.DropTable(
@@ -514,10 +621,10 @@ namespace Project_2_Web_Api.Migrations
                 name: "Visits");
 
             migrationBuilder.DropTable(
-                name: "TaskForVisit");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "TaskForVisit");
 
             migrationBuilder.DropTable(
                 name: "Distributors");
@@ -527,6 +634,9 @@ namespace Project_2_Web_Api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Areas");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "Positions");

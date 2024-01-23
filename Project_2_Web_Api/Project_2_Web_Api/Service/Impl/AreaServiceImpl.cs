@@ -12,11 +12,13 @@ public class AreaServiceImpl : AreaService
 	private DatabaseContext db;
 	private readonly IHttpContextAccessor httpContextAccessor;
 	private readonly IMapper mapper;
+	private readonly UserServiceAccessor userServiceAccessor;
 	public AreaServiceImpl(DatabaseContext db,
 		IHttpContextAccessor httpContextAccessor,
-		IMapper mapper
+		IMapper mapper, UserServiceAccessor userServiceAccessor
 		)
 	{
+		this.userServiceAccessor = userServiceAccessor;
 		this.db = db;
 		this.mapper = mapper;
 		this.httpContextAccessor = httpContextAccessor;
@@ -34,20 +36,26 @@ public class AreaServiceImpl : AreaService
 			}
 			else
 			{
-
-				if (await db.Areas.FirstOrDefaultAsync(x => x.Code.ToLower() == area.Code.ToLower()) != null)
+				if (await userServiceAccessor.CheckPermission("Create new area") || await userServiceAccessor.IsSystem())
 				{
-					return new BadRequestObjectResult(new { error = "Code already exist!" });
-				}
-				db.Areas.Add(area);
-				int check = await db.SaveChangesAsync();
-				if (check > 0)
-				{
-					return new OkObjectResult(new { msg = "Added successfully!" });
+					if (await db.Areas.FirstOrDefaultAsync(x => x.Code.ToLower() == area.Code.ToLower()) != null)
+					{
+						return new BadRequestObjectResult(new { error = "Code already exist!" });
+					}
+					db.Areas.Add(area);
+					int check = await db.SaveChangesAsync();
+					if (check > 0)
+					{
+						return new OkObjectResult(new { msg = "Added successfully!" });
+					}
+					else
+					{
+						return new BadRequestObjectResult(new { error = "Added failure!" });
+					}
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Added failure!" });
+					return new UnauthorizedResult();
 				}
 			}
 			
@@ -64,26 +72,32 @@ public class AreaServiceImpl : AreaService
 		{
 			if (nameArea == null)
 			{
-				return new BadRequestObjectResult(new {error = "Name Area required !!"});
+				return new BadRequestObjectResult(new { error = "Name Area required !!" });
 			}
 			else
 			{
-				
-				var area = await db.Areas.FindAsync(id);
-				if (area == null)
+				if (await userServiceAccessor.CheckPermission("Update area detail ") || await userServiceAccessor.IsSystem())
 				{
-					return  new BadRequestObjectResult(new { error = "Id Area not exist !!" });
-				}
+					var area = await db.Areas.FindAsync(id);
+					if (area == null)
+					{
+						return new BadRequestObjectResult(new { error = "Id Area not exist !!" });
+					}
 					area.Name = nameArea;
-				db.Entry(area).State = EntityState.Modified;
-				int check = await db.SaveChangesAsync();
-				if (check > 0)
-				{
-					return new OkObjectResult(new { msg = "Update successfully!" });
+					db.Entry(area).State = EntityState.Modified;
+					int check = await db.SaveChangesAsync();
+					if (check > 0)
+					{
+						return new OkObjectResult(new { msg = "Update successfully!" });
+					}
+					else
+					{
+						return new BadRequestObjectResult(new { error = "Update failure!" });
+					}
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Update failure!" });
+					return new UnauthorizedResult();
 				}
 			}
 
@@ -181,15 +195,22 @@ public class AreaServiceImpl : AreaService
 			}
 			else
 			{
-				db.Areas.Remove(await db.Areas.FindAsync(id));
-				var check = await db.SaveChangesAsync();
-				if (check > 0)
+				if (await userServiceAccessor.CheckPermission("Delete areas") || await userServiceAccessor.IsSystem())
 				{
-					return new OkObjectResult(new { msg = "Delete Successfully!" });
+					db.Areas.Remove(await db.Areas.FindAsync(id));
+					var check = await db.SaveChangesAsync();
+					if (check > 0)
+					{
+						return new OkObjectResult(new { msg = "Delete Successfully!" });
+					}
+					else
+					{
+						return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					}
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					return new UnauthorizedResult();
 				}
 			}
 		}

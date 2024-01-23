@@ -1,4 +1,5 @@
 ﻿using Castle.Core.Internal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_2_Web_Api.DTO;
 using Project_2_Web_Api.Service;
@@ -38,5 +39,11 @@ public class AuthController : ControllerBase
 		}
 
 		return Ok(new { accessToken = result });
+	}
+	[HttpDelete]
+	[Authorize]
+	public async Task<IActionResult> RevokeToken()
+	{
+		return Ok();
 	}
 }

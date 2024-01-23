@@ -22,6 +22,10 @@ public partial class Distributor
 	public bool? IsStatus { get; set; }
 	public Guid? CreateBy { get; set; }
 	public string? PhotoAvatar { get; set; }
+
+	public string? PasswordResetToken { get; set; }
+	public DateTime? ResetTokenExpires { get; set; }
+
 	[Required]
 	public int? PositionId { get; set; }
 	public DateTime CreatedDate { get; set; }

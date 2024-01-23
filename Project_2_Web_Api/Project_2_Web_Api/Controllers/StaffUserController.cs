@@ -190,15 +190,7 @@ public class StaffUserController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			return Ok(await staffUserService.FindById(User?.Identity?.Name));
+			return Ok(await userServiceAccessor.GetByMe());
 		}
 		catch (Exception ex)
 		{
