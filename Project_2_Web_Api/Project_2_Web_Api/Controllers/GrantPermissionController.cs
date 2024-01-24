@@ -9,7 +9,7 @@ using Project_2_Web_API.Models;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(Roles = "Administrator,Owner")]
 public class GrantPermissionController : ControllerBase
 {
 
@@ -28,18 +28,6 @@ public class GrantPermissionController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
 			return Ok(await grantPermissionService.FindAll());
 		}catch(Exception ex)
 		{
@@ -54,18 +42,6 @@ public class GrantPermissionController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
 			return Ok(await grantPermissionService.FindById(id));
 		}
 		catch (Exception ex)
@@ -81,18 +57,7 @@ public class GrantPermissionController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await grantPermissionService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -106,18 +71,7 @@ public class GrantPermissionController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody]GrantPermissionDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await grantPermissionService.Create(request);
 	}
 
@@ -126,18 +80,7 @@ public class GrantPermissionController : ControllerBase
 	[HttpPut("update/{id}")]
 	public async Task<IActionResult> Put(int id, [FromBody] GrantPermissionDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await grantPermissionService.Update(id, request);
 	}
 
@@ -146,18 +89,7 @@ public class GrantPermissionController : ControllerBase
 	[HttpDelete("delete/{id}")]
 	public async Task<IActionResult> Delete(int id)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await grantPermissionService.Delete(id);
 	}
 }

@@ -48,6 +48,7 @@ public class TestController : ControllerBase
 		if (!_isRun1)
 		{
 			var data = new PositionDTO { Name = "Administrator", PositionGroupId = 1 };
+			_isRun1 = true;
 			return await positionService.Create(data);
 		}
 		return Unauthorized();
@@ -62,6 +63,7 @@ public class TestController : ControllerBase
 		if (!_isRun2)
 		{
 			var data = new StaffUserDTO { Fullname = "Supper admin", Email = email, PositionId = 1, IsStatus = false, StaffSuperiorId = null, StaffInteriorId = null };
+			_isRun2 = true;
 			return await staffUserService.Create(data);
 		}
 		return Unauthorized();

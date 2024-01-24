@@ -66,7 +66,7 @@ public class DistributorServiceImpl : DistributorService
 					var checkPosition = await db.Positions.FindAsync(distributor.PositionId);
 					if (checkPosition.Name.ToLower() != "distributor - om/tl")
 					{
-						return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
+						return new BadRequestObjectResult(new { msg = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
 					}
 					distributor.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
 					distributor.CreatedDate = DateTime.Now;
@@ -78,11 +78,11 @@ public class DistributorServiceImpl : DistributorService
 
 					if (parseGuid1 == false)
 					{
-						return new BadRequestObjectResult(new { error = "Id Sale Management invalid !!" });
+						return new BadRequestObjectResult(new { msg = "Id Sale Management invalid !!" });
 					}
 					if (await db.StaffUsers.FindAsync(idSaleManagement) == null)
 					{
-						return new BadRequestObjectResult(new { error = "Id Sale Management not exist !!" });
+						return new BadRequestObjectResult(new { msg = "Id Sale Management not exist !!" });
 					}
 					if (!distributorDTO.IdSales.IsNullOrEmpty())
 					{
@@ -90,11 +90,11 @@ public class DistributorServiceImpl : DistributorService
 						bool parseGuid2 = Guid.TryParse(distributorDTO.IdSales, out idSales);
 						if (parseGuid1 == false)
 						{
-							return new BadRequestObjectResult(new { error = "Id Sales invalid !!" });
+							return new BadRequestObjectResult(new { msg = "Id Sales invalid !!" });
 						}
 						if (await db.StaffUsers.FindAsync(idSales) == null)
 						{
-							return new BadRequestObjectResult(new { error = "Id Sales not exist !!" });
+							return new BadRequestObjectResult(new { msg = "Id Sales not exist !!" });
 						}
 						distributor.SalesId = idSales;
 					}
@@ -102,18 +102,18 @@ public class DistributorServiceImpl : DistributorService
 					var check = mailHelper.Send(configuration["Gmail:Username"], distributor.Email, "Welcome " + distributor.Name + " to join CDExcellent", MailHelper.HtmlNewAccount(distributor.Name, distributor.Email, password));
 					if (!check)
 					{
-						return new BadRequestObjectResult(new { error = "Email sending failed." });
+						return new BadRequestObjectResult(new { msg = "Email sending failed." });
 					}
 					var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
 					distributor.Password = hashPassword;
 					db.Distributors.Add(distributor);
 					if (await db.SaveChangesAsync() > 0)
 					{
-						return new OkObjectResult(new { msg = "Added successfully !!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Added failure !!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 				}
 				else
@@ -125,7 +125,7 @@ public class DistributorServiceImpl : DistributorService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 
 	}
@@ -140,7 +140,7 @@ public class DistributorServiceImpl : DistributorService
 		{
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+				return new BadRequestObjectResult(new { msg = "Id Distributor invalid !!" });
 			}
 			if (modelState != null && !modelState.IsValid)
 			{
@@ -169,25 +169,25 @@ public class DistributorServiceImpl : DistributorService
 					var checkPosition = await db.Positions.FindAsync(distributor.PositionId);
 					if (checkPosition.Name.ToLower() != "distributor - om/tl")
 					{
-						return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
+						return new BadRequestObjectResult(new { msg = "Position option is invalid. You can only choose 'Distributor - OM/TL'" });
 					}
 					else
 					{
 						var data = await db.Distributors.FindAsync(idDistributor);
 						if (data == null)
 						{
-							return new BadRequestObjectResult(new { error = "Id Distributor not exist!!" });
+							return new BadRequestObjectResult(new { msg = "Id Distributor not exist!!" });
 						}
 						Guid idSaleManagement;
 						bool parseGuid1 = Guid.TryParse(distributorDTO.IdSaleManagement, out idSaleManagement);
 
 						if (parseGuid1 == false)
 						{
-							return new BadRequestObjectResult(new { error = "Id Sale Management invalid !!" });
+							return new BadRequestObjectResult(new { msg = "Id Sale Management invalid !!" });
 						}
 						if (await db.StaffUsers.FindAsync(idSaleManagement) == null)
 						{
-							return new BadRequestObjectResult(new { error = "Id Sale Management not exist !!" });
+							return new BadRequestObjectResult(new { msg = "Id Sale Management not exist !!" });
 						}
 						if (distributorDTO.IdSales != null)
 						{
@@ -199,7 +199,7 @@ public class DistributorServiceImpl : DistributorService
 							}
 							if (await db.StaffUsers.FindAsync(idSales) == null)
 							{
-								return new BadRequestObjectResult(new { error = "Id Sales not exist !!" });
+								return new BadRequestObjectResult(new { msg = "Id Sales not exist !!" });
 							}
 							distributor.SalesId = idSales;
 							data.SalesId = distributor.SalesId;
@@ -213,11 +213,11 @@ public class DistributorServiceImpl : DistributorService
 						db.Entry(data).State = EntityState.Modified;
 						if (await db.SaveChangesAsync() > 0)
 						{
-							return new OkObjectResult(new { msg = "Update successfully !!" });
+							return new OkObjectResult(new { msg = true });
 						}
 						else
 						{
-							return new BadRequestObjectResult(new { error = "Update failure !!" });
+							return new BadRequestObjectResult(new { msg = false });
 						}
 					}
 				}
@@ -243,11 +243,11 @@ public class DistributorServiceImpl : DistributorService
 			{
 				if (parseGuid == false)
 				{
-					return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+					return new BadRequestObjectResult(new { msg = "Id Distributor invalid !!" });
 				}
 				if (await db.Distributors.FindAsync(idDistributor) == null)
 				{
-					return new BadRequestObjectResult(new { error = "Id Distributor does not exist!" });
+					return new BadRequestObjectResult(new { msg = "Id Distributor does not exist!" });
 				}
 				else
 				{
@@ -255,11 +255,11 @@ public class DistributorServiceImpl : DistributorService
 					var check = await db.SaveChangesAsync();
 					if (check > 0)
 					{
-						return new OkObjectResult(new { msg = "Delete Successfully!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Delete Failed!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 				}
 			}
@@ -270,7 +270,7 @@ public class DistributorServiceImpl : DistributorService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -281,7 +281,7 @@ public class DistributorServiceImpl : DistributorService
 
 			if (await db.Distributors.AnyAsync() == false)
 			{
-				return new { error = "Data is null !!!" };
+				return new { msg = "Data is null !!!" };
 			}
 			return await db.Distributors.Select(x => new
 			{
@@ -308,7 +308,7 @@ public class DistributorServiceImpl : DistributorService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -351,7 +351,7 @@ public class DistributorServiceImpl : DistributorService
 		}
 		catch (Exception ex)
 		{
-			return new { error = ex.Message };
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -363,7 +363,7 @@ public class DistributorServiceImpl : DistributorService
 			if (await db.Distributors.AnyAsync() == false
 				|| await db.Distributors.Where(x => x.Name.ToLower().Contains(name.ToLower())).AnyAsync() == false)
 			{
-				return new { error = "Data is null !!!" };
+				return new { msg = "Data is null !!!" };
 			}
 			return await db.Distributors.Where(x => x.Name.ToLower().Contains(name.ToLower())).Select(x => new
 			{
@@ -390,7 +390,7 @@ public class DistributorServiceImpl : DistributorService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -402,12 +402,12 @@ public class DistributorServiceImpl : DistributorService
 		{
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+				return new BadRequestObjectResult(new { msg = "Id Distributor invalid !!" });
 			}
 			var data = await db.Distributors.FindAsync(idDistributor);
 			if (data == null)
 			{
-				return new BadRequestObjectResult(new { error = "Id Distributor does not exist !!" });
+				return new BadRequestObjectResult(new { msg = "Id Distributor does not exist !!" });
 			}
 			var permissionDB = await db.GrantPermissions.ToListAsync();
 			foreach (var permision in permissions)
@@ -419,19 +419,19 @@ public class DistributorServiceImpl : DistributorService
 					if (await db.SaveChangesAsync() > 0) ;
 					else
 					{
-						return new BadRequestObjectResult(new { error = "The system encountered a problem !!" });
+						return new BadRequestObjectResult(new { msg = "The system encountered a problem !!" });
 					}
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "ID Permission does not exist !!" });
+					return new BadRequestObjectResult(new { msg = "ID Permission does not exist !!" });
 				}
 			}
 			return new OkObjectResult(new { msg = "Add permissions to user successfully" });
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -444,12 +444,12 @@ public class DistributorServiceImpl : DistributorService
 			bool parseGuid = Guid.TryParse(id, out idDistributor);
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+				return new BadRequestObjectResult(new { msg = "Id Distributor invalid !!" });
 			}
 			var distributor = await db.Distributors.FindAsync(idDistributor);
 			if (distributor == null)
 			{
-				return new BadRequestObjectResult(new { error = "Id Distributor does not exist !!" });
+				return new BadRequestObjectResult(new { msg = "Id Distributor does not exist !!" });
 			}
 			var password = RandomHelper.RandomDefaultPassword(12);
 			var mailHelper = new MailHelper(configuration);
@@ -463,24 +463,24 @@ public class DistributorServiceImpl : DistributorService
 			var check = mailHelper.Send(configuration["Gmail:Username"], distributor.Email, "Reset password account CDExcellent", content);
 			if (!check)
 			{
-				return new BadRequestObjectResult(new { error = "Email sending failed." });
+				return new BadRequestObjectResult(new { msg = "Email sending failed." });
 			}
 			var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
 			distributor.Password = hashPassword;
 			db.Entry(distributor).State = EntityState.Modified;
 			if (await db.SaveChangesAsync() > 0)
 			{
-				return new OkObjectResult(new { msg = "Reset password success !!" });
+				return new OkObjectResult(new { msg = true });
 			}
 			else
 			{
-				return new BadRequestObjectResult(new { error = "Reset password failure !!" });
+				return new BadRequestObjectResult(new { msg = false });
 			}
 
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 }

@@ -21,22 +21,12 @@ public class DistributorController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpGet("find-all")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> GetAll()
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await distributorService.FindAll());
 		}
 		catch (Exception ex)
@@ -52,18 +42,7 @@ public class DistributorController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await distributorService.FindById(id));
 		}
 		catch (Exception ex)
@@ -75,22 +54,12 @@ public class DistributorController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpGet("find-by-name/{name}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> GetByName(string name)
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await distributorService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -104,18 +73,7 @@ public class DistributorController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody] DistributorDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await distributorService.Create(request);
 	}
 
@@ -124,18 +82,7 @@ public class DistributorController : ControllerBase
 	[HttpPut("update/{id}")]
 	public async Task<IActionResult> Update(string id, [FromBody] DistributorDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await distributorService.Update(id, request);
 	}
 
@@ -144,18 +91,6 @@ public class DistributorController : ControllerBase
 	[HttpDelete("delete/{id}")]
 	public async Task<IActionResult> Delete(string id)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
 		return await distributorService.Delete(id);
 	}
 	[Produces("application/json")]
@@ -165,18 +100,6 @@ public class DistributorController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
 			return await distributorService.SettingPermission(request.Id, request.PermissionId);
 		}
 		catch (Exception ex)
@@ -190,18 +113,7 @@ public class DistributorController : ControllerBase
 	[HttpPut("reset-password")]
 	public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await distributorService.ResetPassword(request.Id);
 	}
 	[Produces("application/json")]

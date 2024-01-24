@@ -41,6 +41,10 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 			}
 			else
 			{
+				if(await db.Visits.AsNoTracking().FirstOrDefaultAsync(x=>x.Id == taskForVisit.VisitId) == null)
+				{
+					return new OkObjectResult(new { msg = "Id Visit does not exist" });
+				}
 				taskForVisit.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
 				taskForVisit.Status = "Đã Giao Việc";
 				db.TaskForVisit.Add(taskForVisit);
@@ -50,13 +54,13 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = false });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -66,7 +70,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		{
 			if (await db.TaskForVisit.AnyAsync() == false)
 			{
-				return new OkObjectResult(new { error = "Data is null !" });
+				return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			else
 			{
@@ -85,6 +89,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 					{
 						id = x.Id,
 						title = x.Title,
+						visitId = x.VisitId,
 						assignedStaffUser = new
 						{
 							id = x.AssignedStaffUserId,
@@ -108,6 +113,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 					{
 						id = x.Id,
 						title = x.Title,
+						visitId = x.VisitId,
 						assignedStaffUser = new
 						{
 							id = x.AssignedStaffUserId,
@@ -138,7 +144,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 			});
 		}
 	}
@@ -149,7 +155,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		{
 			if (await db.TaskForVisit.AnyAsync() == false)
 			{
-				return new OkObjectResult(new { error = "Data is null !" });
+				return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			else
 			{
@@ -168,6 +174,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 					{
 						id = x.Id,
 						title = x.Title,
+						visitId = x.VisitId,
 						assignedStaffUser = new
 						{
 							id = x.AssignedStaffUserId,
@@ -198,6 +205,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 					{
 						id = x.Id,
 						title = x.Title,
+						visitId = x.VisitId,
 						assignedStaffUser = new
 						{
 							id = x.AssignedStaffUserId,
@@ -220,7 +228,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 			});
 		}
 	}
@@ -231,7 +239,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		{
 			if (await db.TaskForVisit.AnyAsync() == false || await db.TaskForVisit.FindAsync(id) == null )
 			{
-				return new OkObjectResult(new { error = "Data is null !" });
+				return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			else
 			{
@@ -250,6 +258,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 					{
 						id = x.Id,
 						title = x.Title,
+						visitId = x.VisitId,
 						assignedStaffUser = new
 						{
 							id = x.AssignedStaffUserId,
@@ -280,6 +289,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 					{
 						id = x.Id,
 						title = x.Title,
+						visitId = x.VisitId,
 						assignedStaffUser = new
 						{
 							id = x.AssignedStaffUserId,
@@ -302,7 +312,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 			});
 		}
 	}
@@ -313,7 +323,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		{
 			if (await db.TaskForVisit.AnyAsync() == false)
 			{
-			return new OkObjectResult(new { error = "Data is null !" });
+			return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			else
 			{
@@ -332,6 +342,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 					{
 						id = x.Id,
 						title = x.Title,
+						visitId = x.VisitId,
 						assignedStaffUser = new
 						{
 							id = x.AssignedStaffUserId,
@@ -356,6 +367,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 						{
 							id = x.Id,
 							title = x.Title,
+							visitId = x.VisitId,
 							assignedStaffUser = new
 							{
 								id = x.AssignedStaffUserId,
@@ -379,7 +391,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 });
 		}
 	}
@@ -417,17 +429,17 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 			db.Entry(data).State = EntityState.Modified;
 			if (await db.SaveChangesAsync() > 0)
 			{
-				return new OkObjectResult(new { msg = "Upload file success" });
+				return new OkObjectResult(new { msg = true });
 			}
 			else
 			{
-				return new BadRequestObjectResult(new { msg = "Upload file fail" });
+				return new BadRequestObjectResult(new { msg = false });
 			}
 
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -438,7 +450,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 			var data = await db.TaskForVisit.FindAsync(id);
 			if (data == null)
 			{
-				return  new BadRequestObjectResult(new { error = "Id does not exist" });
+				return  new BadRequestObjectResult(new { msg = "Id does not exist" });
 			}
 			foreach (var file in fileReport)
 			{
@@ -454,17 +466,17 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 			db.Entry(data).State = EntityState.Modified;
 			if(await db.SaveChangesAsync() > 0)
 			{
-				return new OkObjectResult(new { msg = "Upload file success" });
+				return new OkObjectResult(new { msg =true });
 			}
 			else
 			{
-				return new BadRequestObjectResult(new { msg = "Upload file fail" });
+				return new BadRequestObjectResult(new { msg = false });
 			}
 			
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 
 	}

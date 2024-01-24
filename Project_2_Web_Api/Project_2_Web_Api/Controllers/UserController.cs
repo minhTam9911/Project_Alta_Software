@@ -22,21 +22,12 @@ public class UserController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpGet("find-all")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> GetAll()
 	{
 		try
 		{
-			if(await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}if(await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await userService.FindAll());
 		}catch(Exception ex)
 		{
@@ -51,18 +42,6 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
 			return Ok(await userService.FindById(id));
 		}
 		catch (Exception ex)
@@ -74,22 +53,12 @@ public class UserController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpGet("find-by-name/{name}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> GetByName(string name)
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await userService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -118,20 +87,10 @@ public class UserController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpDelete("delete/{id}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> Delete(string id)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await userService.Delete(id);
 	}
 	[Produces("application/json")]

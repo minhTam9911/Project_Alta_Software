@@ -50,7 +50,7 @@ public class VisitServiceImpl : VisitService
 				var distributor = await db.Distributors.FindAsync(visit.DistributorId);
 				if(distributor == null)
 				{
-					return new BadRequestObjectResult(new {error = "Id Distributor does not exist"});
+					return new BadRequestObjectResult(new {msg = "Id Distributor does not exist"});
 				}
 				var nameCreateBy = await db.StaffUsers.FindAsync(visit.CreateBy);
 				var mailHelper = new MailHelper(configuration);
@@ -65,15 +65,15 @@ public class VisitServiceImpl : VisitService
 				var check = mailHelper.Send(configuration["Gmail:Username"], distributor.Email, "Invitation to attend a company visit", content);
 				if (!check)
 				{
-					return new BadRequestObjectResult(new { error = "Email sending failed." });
+					return new BadRequestObjectResult(new { msg = "Email sending failed." });
 				}
 				db.Visits.Add(visit);
 				if(await db.SaveChangesAsync() >0 ) {
-					return new OkObjectResult(new { msg = "Added Successfully !!" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Added failure !!" });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 			}
 		}
@@ -93,7 +93,7 @@ public class VisitServiceImpl : VisitService
 		{
 			if( await db.Visits.AnyAsync() == false)
 			{
-				return new OkObjectResult(new { error = "Data is null !" });
+				return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			if(await userServiceAccessor.IsGuest() || await userServiceAccessor.IsDistributor())
 			{
@@ -132,7 +132,7 @@ public class VisitServiceImpl : VisitService
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 			});
 		}
 	}
@@ -156,14 +156,25 @@ public class VisitServiceImpl : VisitService
 				db.Entry(data).State = EntityState.Modified;
 				await db.SaveChangesAsync();
 				db.Visits.Remove(await db.Visits.FindAsync(id));
+				
+				var removeTaskForVisit = await db.TaskForVisit.Where(x => x.VisitId == data.Id).ToListAsync();
+				if(removeTaskForVisit != null)
+				{
+					foreach(var i in removeTaskForVisit)
+					{
+						db.Comments.Remove(await db.Comments.FirstOrDefaultAsync(x => x.TaskId == i.Id));
+						await db.SaveChangesAsync();
+					}
+					db.TaskForVisit.RemoveRange(removeTaskForVisit);
+				}
 				var check = await db.SaveChangesAsync();
 				if (check > 0)
 				{
-					return new OkObjectResult(new { msg = "Delete Successfully!" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 			}
 			else
@@ -173,7 +184,7 @@ public class VisitServiceImpl : VisitService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -234,7 +245,7 @@ public class VisitServiceImpl : VisitService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -244,11 +255,11 @@ public class VisitServiceImpl : VisitService
 		{
 			if (await db.Visits.AnyAsync() == false)
 			{
-				return new OkObjectResult(new { error = "Data is null !" });
+				return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			if (await db.Visits.FindAsync(id) == null)
 			{
-				return new OkObjectResult(new { error = "Id does not exist !" });
+				return new OkObjectResult(new { msg = "Id does not exist !" });
 			}
 			else
 			{
@@ -283,7 +294,7 @@ public class VisitServiceImpl : VisitService
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 			});
 		}
 	}
@@ -294,7 +305,7 @@ public class VisitServiceImpl : VisitService
 		{
 			if (await db.Visits.AnyAsync() == false)
 			{
-				return new OkObjectResult(new { error = "Data is null !" });
+				return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			else
 			{
@@ -336,7 +347,7 @@ public class VisitServiceImpl : VisitService
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 			});
 		}
 	}
@@ -347,7 +358,7 @@ public class VisitServiceImpl : VisitService
 		{
 			if (await db.Visits.AnyAsync() == false)
 			{
-				return new OkObjectResult(new { error = "Data is null !" });
+				return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			else
 			{
@@ -443,7 +454,7 @@ fullname = x.GuestOfVisit.Fullname
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 			});
 		}
 	}
@@ -454,11 +465,11 @@ fullname = x.GuestOfVisit.Fullname
 		{
 			if (await db.Visits.AnyAsync() == false)
 			{
-				return new OkObjectResult(new { error = "Data is null !" });
+				return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			if (await db.Visits.FindAsync(id) == null)
 			{
-				return new OkObjectResult(new { error = "Id does not exist !" });
+				return new OkObjectResult(new { msg = "Id does not exist !" });
 			}
 			else
 			{
@@ -493,7 +504,7 @@ fullname = x.GuestOfVisit.Fullname
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 			});
 		}
 	}
@@ -504,7 +515,7 @@ fullname = x.GuestOfVisit.Fullname
 		{
 			if (await db.Visits.AnyAsync() == false)
 			{
-				return new OkObjectResult(new { error = "Data is null !" });
+				return new OkObjectResult(new { msg = "Data is null !" });
 			}
 			else
 			{
@@ -542,7 +553,7 @@ fullname = x.GuestOfVisit.Fullname
 		{
 			return new BadRequestObjectResult(new
 			{
-				error = ex.Message
+				msg = ex.Message
 			});
 		}
 	}

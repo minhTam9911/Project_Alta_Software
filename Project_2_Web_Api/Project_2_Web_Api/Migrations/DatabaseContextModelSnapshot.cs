@@ -350,7 +350,6 @@ namespace Project_2_Web_Api.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FilePath")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsStatus")
@@ -479,6 +478,10 @@ namespace Project_2_Web_Api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("VisitId")
+                        .IsRequired()
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AssignedStaffUserId");
@@ -584,6 +587,9 @@ namespace Project_2_Web_Api.Migrations
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("TaskForVisitId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Time")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -595,6 +601,8 @@ namespace Project_2_Web_Api.Migrations
                     b.HasIndex("DistributorId");
 
                     b.HasIndex("GuestOfVisitId");
+
+                    b.HasIndex("TaskForVisitId");
 
                     b.ToTable("Visits");
                 });
@@ -794,6 +802,10 @@ namespace Project_2_Web_Api.Migrations
                         .WithMany()
                         .HasForeignKey("GuestOfVisitId");
 
+                    b.HasOne("Project_2_Web_API.Models.TaskForVisit", null)
+                        .WithMany("Visits")
+                        .HasForeignKey("TaskForVisitId");
+
                     b.Navigation("Distributor");
 
                     b.Navigation("GuestOfVisit");
@@ -859,6 +871,8 @@ namespace Project_2_Web_Api.Migrations
                     b.Navigation("PhotoPathAssigned");
 
                     b.Navigation("PhotoPathReporting");
+
+                    b.Navigation("Visits");
                 });
 
             modelBuilder.Entity("Project_2_Web_API.Models.User", b =>

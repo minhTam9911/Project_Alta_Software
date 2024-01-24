@@ -39,17 +39,17 @@ public class GrantPermissionServiceImpl : GrantPermissionService
 
 				if (await db.GrantPermissions.FirstOrDefaultAsync(x => x.Permission.ToLower() == grantPermission.Permission.ToLower()) != null)
 				{
-					return new BadRequestObjectResult(new { error = "Permission name already exist!" });
+					return new BadRequestObjectResult(new { msg = "Permission name already exist!" });
 				}
 				db.GrantPermissions.Add(grantPermission);
 				int check = await db.SaveChangesAsync();
 				if (check > 0)
 				{
-					return new OkObjectResult(new { msg = "Added successfully!" });
+					return new OkObjectResult(new { msg = true});
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Added failure!" });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 
 
@@ -58,7 +58,7 @@ public class GrantPermissionServiceImpl : GrantPermissionService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -76,12 +76,12 @@ public class GrantPermissionServiceImpl : GrantPermissionService
 				{
 					if ( await db.GrantPermissions.FirstOrDefaultAsync(x => x.Permission.ToLower() == grantPermission.Permission.ToLower() && x.Id != id) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Permission name already exist!" });
+						return new BadRequestObjectResult(new { msg = "Permission name already exist!" });
 					}
 					var data = await db.GrantPermissions.FindAsync(id);
 				if (data == null)
 				{
-					return new BadRequestObjectResult(new { error = "Id does not exist!" });
+					return new BadRequestObjectResult(new { msg = "Id does not exist!" });
 				}
 					data.Permission = grantPermission.Permission;
 					data.Module = grantPermission.Module;
@@ -89,11 +89,11 @@ public class GrantPermissionServiceImpl : GrantPermissionService
 					int check = await db.SaveChangesAsync();
 					if (check > 0)
 					{
-						return new OkObjectResult(new { msg = "Update successfully!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Update failure!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 			}
 		}catch(Exception ex)
@@ -108,7 +108,7 @@ public class GrantPermissionServiceImpl : GrantPermissionService
 		{
 			if (await db.GrantPermissions.FindAsync(id) == null)
 			{
-				return new BadRequestObjectResult(new { error = "Id does not exist!" });
+				return new BadRequestObjectResult(new { msg = "Id does not exist!" });
 			}
 			else
 			{
@@ -116,17 +116,17 @@ public class GrantPermissionServiceImpl : GrantPermissionService
 				var check = await db.SaveChangesAsync();
 				if ( check > 0)
 				{
-					return new OkObjectResult(new { msg = "Delete Successfully!" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 

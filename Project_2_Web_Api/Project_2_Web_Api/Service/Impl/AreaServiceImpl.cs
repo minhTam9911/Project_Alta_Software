@@ -40,17 +40,17 @@ public class AreaServiceImpl : AreaService
 				{
 					if (await db.Areas.FirstOrDefaultAsync(x => x.Code.ToLower() == area.Code.ToLower()) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Code already exist!" });
+						return new BadRequestObjectResult(new { msg = "Code already exist!" });
 					}
 					db.Areas.Add(area);
 					int check = await db.SaveChangesAsync();
 					if (check > 0)
 					{
-						return new OkObjectResult(new { msg = "Added successfully!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Added failure!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 				}
 				else
@@ -62,7 +62,7 @@ public class AreaServiceImpl : AreaService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -72,7 +72,7 @@ public class AreaServiceImpl : AreaService
 		{
 			if (nameArea == null)
 			{
-				return new BadRequestObjectResult(new { error = "Name Area required !!" });
+				return new BadRequestObjectResult(new { msg = "Name Area required !!" });
 			}
 			else
 			{
@@ -81,18 +81,18 @@ public class AreaServiceImpl : AreaService
 					var area = await db.Areas.FindAsync(id);
 					if (area == null)
 					{
-						return new BadRequestObjectResult(new { error = "Id Area not exist !!" });
+						return new BadRequestObjectResult(new { msg = "Id Area not exist !!" });
 					}
 					area.Name = nameArea;
 					db.Entry(area).State = EntityState.Modified;
 					int check = await db.SaveChangesAsync();
 					if (check > 0)
 					{
-						return new OkObjectResult(new { msg = "Update successfully!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Update failure!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 				}
 				else
@@ -104,7 +104,7 @@ public class AreaServiceImpl : AreaService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -116,16 +116,16 @@ public class AreaServiceImpl : AreaService
 		{
 			if (parseGuid ==false)
 			{
-			return new BadRequestObjectResult(new { error = "Id Statff invalid !!" });
+			return new BadRequestObjectResult(new { msg = "Id Statff invalid !!" });
 			}
 			if (await db.StaffUsers.FindAsync(idStaff) == null)
 			{
-				return new BadRequestObjectResult(new { error = "ID Staff does not exist!" });
+				return new BadRequestObjectResult(new { msg = "ID Staff does not exist!" });
 			}
 			var area = await db.Areas.FirstOrDefaultAsync(x => x.Id == idArea);
 			if(area == null)
 			{
-				return new BadRequestObjectResult(new { error = "ID Area does not exist!" });
+				return new BadRequestObjectResult(new { msg = "ID Area does not exist!" });
 			}
 			var staff = await db.StaffUsers.FirstOrDefaultAsync(x=>x.Id == idStaff);
 			area.StaffUsers.Add(staff);
@@ -133,16 +133,16 @@ public class AreaServiceImpl : AreaService
 			int check = await db.SaveChangesAsync();
 			if (check > 0)
 			{
-				return new OkObjectResult(new { msg = "Added successfully!" });
+				return new OkObjectResult(new { msg = true });
 			}
 				else
 			{
-				return new BadRequestObjectResult(new { error = "Added failure!" });
+				return new BadRequestObjectResult(new { msg = false });
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -154,16 +154,16 @@ public class AreaServiceImpl : AreaService
 		{
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id Statff invalid !!" });
+				return new BadRequestObjectResult(new { msg = "Id Statff invalid !!" });
 			}
 			if (await db.StaffUsers.FindAsync(idStaff) == null)
 			{
-				return new BadRequestObjectResult(new { error = "ID Staff does not exist!" });
+				return new BadRequestObjectResult(new { msg = "ID Staff does not exist!" });
 			}
 			var area = await db.Areas.FirstOrDefaultAsync(x => x.Id == idArea);
 			if (area == null)
 			{
-				return new BadRequestObjectResult(new { error = "ID Area does not exist!" });
+				return new BadRequestObjectResult(new { msg = "ID Area does not exist!" });
 			}
 			
 				area.StaffUsers.Remove(await db.StaffUsers.FindAsync(idStaff));
@@ -172,16 +172,16 @@ public class AreaServiceImpl : AreaService
 			int check = await db.SaveChangesAsync();
 			if (check > 0)
 			{
-				return new OkObjectResult(new { msg = "Remove successfully!" });
+				return new OkObjectResult(new { msg = true });
 			}
 			else
 			{
-				return new BadRequestObjectResult(new { error = "Remove failure!" });
+				return new BadRequestObjectResult(new { msg = false });
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -191,7 +191,7 @@ public class AreaServiceImpl : AreaService
 		{
 			if (await db.Areas.FindAsync(id) == null)
 			{
-				return new BadRequestObjectResult(new { error = "Id does not exist!" });
+				return new BadRequestObjectResult(new { msg = "Id does not exist!" });
 			}
 			else
 			{
@@ -204,11 +204,11 @@ public class AreaServiceImpl : AreaService
 					var check = await db.SaveChangesAsync();
 					if (check > 0)
 					{
-						return new OkObjectResult(new { msg = "Delete Successfully!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Delete Failed!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 				}
 				else
@@ -219,7 +219,7 @@ public class AreaServiceImpl : AreaService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -258,7 +258,7 @@ public class AreaServiceImpl : AreaService
 			}).ToListAsync();
 		}catch(Exception ex)
 		{
-			return new {error =  ex.Message};
+			return new {msg =  ex.Message};
 		}
 	}
 
@@ -298,7 +298,7 @@ public class AreaServiceImpl : AreaService
 		}
 		catch (Exception ex)
 		{
-			return new { error = ex.Message };
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -338,7 +338,7 @@ public class AreaServiceImpl : AreaService
 		}
 		catch (Exception ex)
 		{
-			return new { error = ex.Message };
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -350,16 +350,16 @@ public class AreaServiceImpl : AreaService
 		{
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+				return new BadRequestObjectResult(new { msg = "Id Distributor invalid !!" });
 			}
 			if (await db.Distributors.FindAsync(idDistributor) == null)
 			{
-				return new BadRequestObjectResult(new { error = "ID Distributor does not exist!" });
+				return new BadRequestObjectResult(new { msg = "ID Distributor does not exist!" });
 			}
 			var area = await db.Areas.FirstOrDefaultAsync(x => x.Id == idArea);
 			if (area == null)
 			{
-				return new BadRequestObjectResult(new { error = "ID Area does not exist!" });
+				return new BadRequestObjectResult(new { msg = "ID Area does not exist!" });
 			}
 			var distributor = await db.Distributors.FirstOrDefaultAsync(x => x.Id == idDistributor);
 			area.Distributors.Add(distributor);
@@ -367,16 +367,16 @@ public class AreaServiceImpl : AreaService
 			int check = await db.SaveChangesAsync();
 			if (check > 0)
 			{
-				return new OkObjectResult(new { msg = "Added successfully!" });
+				return new OkObjectResult(new { msg = true });
 			}
 			else
 			{
-				return new BadRequestObjectResult(new { error = "Added failure!" });
+				return new BadRequestObjectResult(new { msg = false });
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -388,16 +388,16 @@ public class AreaServiceImpl : AreaService
 		{
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id Distributor invalid !!" });
+				return new BadRequestObjectResult(new { msg = "Id Distributor invalid !!" });
 			}
 			if (await db.Distributors.FindAsync(idDistributor) == null)
 			{
-				return new BadRequestObjectResult(new { error = "ID Distributor does not exist!" });
+				return new BadRequestObjectResult(new { msg = "ID Distributor does not exist!" });
 			}
 			var area = await db.Areas.FirstOrDefaultAsync(x => x.Id == idArea);
 			if (area == null)
 			{
-				return new BadRequestObjectResult(new { error = "ID Area does not exist!" });
+				return new BadRequestObjectResult(new { msg = "ID Area does not exist!" });
 			}
 			
 				area.Distributors.Remove( await db.Distributors.FindAsync(idDistributor));
@@ -406,16 +406,16 @@ public class AreaServiceImpl : AreaService
 			int check = await db.SaveChangesAsync();
 			if (check > 0)
 			{
-				return new OkObjectResult(new { msg = "Remove successfully!" });
+				return new OkObjectResult(new { msg = true });
 			}
 			else
 			{
-				return new BadRequestObjectResult(new { error = "Remove failure!" });
+				return new BadRequestObjectResult(new { msg = false });
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 }

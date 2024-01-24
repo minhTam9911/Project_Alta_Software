@@ -26,7 +26,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 		{
 			if(await db.PositionGroups.FindAsync(Int32.Parse(id)) == null)
 			{
-				return new BadRequestObjectResult(new { error = "id does not exist!" });
+				return new BadRequestObjectResult(new { msg = "id does not exist!" });
 			}
 			else
 			{
@@ -34,16 +34,16 @@ public class PositionGroupServiceImpl : PositionGroupService
 				var check = db.SaveChangesAsync();
 				if (await check > 0)
 				{
-					return new OkObjectResult(new { msg = "Delete Successfully!" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 			}
 		}catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -64,7 +64,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 		}
 		catch(Exception ex)
 		{
-			return new { error = ex.Message };
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -88,7 +88,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 		}
 		catch (Exception ex)
 		{
-			return new { error = ex.Message };
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -113,7 +113,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 		}
 		catch (Exception ex)
 		{
-			return new { error = ex.Message };
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -141,11 +141,11 @@ public class PositionGroupServiceImpl : PositionGroupService
 						int check = await db.SaveChangesAsync();
 						if (check > 0)
 						{
-							return new OkObjectResult(new { msg = "Added successfully!" });
+							return new OkObjectResult(new { msg = true });
 						}
 						else
 						{
-							return new BadRequestObjectResult(new { error = "Added failure!" });
+							return new BadRequestObjectResult(new { msg =false });
 						}
 
 					
@@ -155,7 +155,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -184,11 +184,11 @@ public class PositionGroupServiceImpl : PositionGroupService
 					int check = await db.SaveChangesAsync();
 					if (check > 0)
 					{
-						return new OkObjectResult(new { msg = "Update successfully!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Update failure!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 
 
@@ -197,7 +197,7 @@ public class PositionGroupServiceImpl : PositionGroupService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { msg = ex });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 }

@@ -45,24 +45,24 @@ public class UserServiceImpl : UserService
 				if (await userServiceAccessor.CheckPermission("Add new users") || await userServiceAccessor.IsSystem()){
 					if (await db.Users.FirstOrDefaultAsync(x => x.Email == userDTO.Email) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+						return new BadRequestObjectResult(new { msg = "Email already exist!!" });
 					}
 					if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == userDTO.Email) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+						return new BadRequestObjectResult(new { msg = "Email already exist!!" });
 					}
 					if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == userDTO.Email) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+						return new BadRequestObjectResult(new { msg = "Email already exist!!" });
 					}
 					if (await db.Positions.FindAsync(user.PositionId) == null)
 					{
-						return new BadRequestObjectResult(new { error = "Position not exist!!" });
+						return new BadRequestObjectResult(new { msg = "Position not exist!!" });
 					}
 					var checkPosition = await db.Positions.FindAsync(user.PositionId);
 					if (checkPosition.Name.ToLower() != "guest" && checkPosition.Name.ToLower() != "other department")
 					{
-						return new BadRequestObjectResult(new { error = "Position option is invalid. You can only choose 'Guest' or 'Other Department'" });
+						return new BadRequestObjectResult(new { msg = "Position option is invalid. You can only choose 'Guest' or 'Other Department'" });
 					}
 					user.CreateBy = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
 					user.CreatedDate = DateTime.Now;
@@ -80,11 +80,11 @@ public class UserServiceImpl : UserService
 					db.Users.Add(user);
 					if (await db.SaveChangesAsync() > 0)
 					{
-						return new OkObjectResult(new { msg = "Added successfully !!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Added failure !!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 				}
 				else
@@ -110,7 +110,7 @@ public class UserServiceImpl : UserService
 		{
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id User invalid !!" });
+				return new BadRequestObjectResult(new { msg = "Id User invalid !!" });
 			}
 			if (modelState != null && !modelState.IsValid)
 			{
@@ -121,19 +121,19 @@ public class UserServiceImpl : UserService
 				if (await userServiceAccessor.CheckPermission("Update user detail") || await userServiceAccessor.IsSystem()){
 					if (await db.Users.FirstOrDefaultAsync(x => x.Email == user.Email && x.Id != idUser) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+						return new BadRequestObjectResult(new { msg = "Email already exist!!" });
 					}
 					if (await db.StaffUsers.FirstOrDefaultAsync(x => x.Email == user.Email) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+						return new BadRequestObjectResult(new { msg = "Email already exist!!" });
 					}
 					if (await db.Distributors.FirstOrDefaultAsync(x => x.Email == user.Email) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Email already exist!!" });
+						return new BadRequestObjectResult(new { msg = "Email already exist!!" });
 					}
 					if (await db.Positions.FindAsync(user.PositionId) == null)
 					{
-						return new BadRequestObjectResult(new { error = "Position not exist!!" });
+						return new BadRequestObjectResult(new { msg = "Position not exist!!" });
 					}
 					else
 					{
@@ -145,11 +145,11 @@ public class UserServiceImpl : UserService
 						db.Entry(data).State = EntityState.Modified;
 						if (await db.SaveChangesAsync() > 0)
 						{
-							return new OkObjectResult(new { msg = "Update successfully !!" });
+							return new OkObjectResult(new { msg = true });
 						}
 						else
 						{
-							return new BadRequestObjectResult(new { error = "Update failure !!" });
+							return new BadRequestObjectResult(new { msg = false });
 						}
 					}
 				}
@@ -161,7 +161,7 @@ public class UserServiceImpl : UserService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -173,12 +173,12 @@ public class UserServiceImpl : UserService
 		{
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id User invalid !!" });
+				return new BadRequestObjectResult(new { msg = "Id User invalid !!" });
 			}
 			var data = await db.Users.FindAsync(idUser);
 			if (data == null)
 			{
-				return new BadRequestObjectResult(new { error = "Id does not exist!" });
+				return new BadRequestObjectResult(new { msg = "Id does not exist!" });
 			}
 			else
 			{
@@ -191,17 +191,17 @@ public class UserServiceImpl : UserService
 				var check = await db.SaveChangesAsync();
 				if (check > 0)
 				{
-					return new OkObjectResult(new { msg = "Delete Successfully!" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					return new BadRequestObjectResult(new { msg =false });
 				}
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -212,7 +212,7 @@ public class UserServiceImpl : UserService
 
 			if (await db.Users.AnyAsync() == false)
 			{
-				return new { error = "Data is null !!!" };
+				return new { msg = "Data is null !!!" };
 			}
 			return await db.Users.Select(x => new
 			{
@@ -239,7 +239,7 @@ public class UserServiceImpl : UserService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -251,13 +251,13 @@ public class UserServiceImpl : UserService
 		{
 			if (parseGuid == false)
 			{
-				return new BadRequestObjectResult(new { error = "Id User invalid !!" });
+				return new { msg = "Id User invalid !!" };
 			}
 			if (await db.Users.AnyAsync() == false || await db.Users.FindAsync(idUser) == null)
 			{
-				return new { error = "Data is null !!!" };
+				return new { msg = "Data is null !!!" };
 			}
-			return await db.Users.Where(x=>x.Id == idUser).Select(x => new
+			return await db.Users.Where(x => x.Id == idUser).Select(x => new
 			{
 				id = x.Id,
 				fullname = x.FullName,
@@ -273,7 +273,7 @@ public class UserServiceImpl : UserService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -285,7 +285,7 @@ public class UserServiceImpl : UserService
 			if (await db.Users.AnyAsync() == false
 				|| await db.Users.Where(x => x.FullName.ToLower().Contains(name.ToLower())).AnyAsync() == false)
 			{
-				return new { error = "Data is null !!!" };
+				return new { msg = "Data is null !!!" };
 			}
 			return await db.Users.Where(x => x.FullName.ToLower().Contains(name.ToLower())).Select(x => new
 			{
@@ -303,7 +303,7 @@ public class UserServiceImpl : UserService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -317,12 +317,12 @@ public class UserServiceImpl : UserService
 			{
 				if (parseGuid == false)
 				{
-					return new BadRequestObjectResult(new { error = "Id User invalid !!" });
+					return new BadRequestObjectResult(new { msg = "Id User invalid !!" });
 				}
 				var data = await db.Users.FindAsync(idUser);
 				if (data == null)
 				{
-					return new BadRequestObjectResult(new { error = "Id User does not exist !!" });
+					return new BadRequestObjectResult(new { msg = "Id User does not exist !!" });
 				}
 				var permissionDB = await db.GrantPermissions.ToListAsync();
 				foreach (var permision in permissions)
@@ -334,15 +334,15 @@ public class UserServiceImpl : UserService
 						if (await db.SaveChangesAsync() > 0) ;
 						else
 						{
-							return new BadRequestObjectResult(new { error = "The system encountered a problem !!" });
+							return new BadRequestObjectResult(new { msg = "The system encountered a problem !!" });
 						}
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "ID Permission does not exist !!" });
+						return new BadRequestObjectResult(new { msg = "ID Permission does not exist !!" });
 					}
 				}
-				return new OkObjectResult(new { msg = "Add permissions to user successfully" });
+				return new OkObjectResult(new { msg = true });
 			}
 			else
 			{
@@ -351,7 +351,7 @@ public class UserServiceImpl : UserService
 		}
 		catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -366,12 +366,12 @@ public class UserServiceImpl : UserService
 				bool parseGuid = Guid.TryParse(id, out idUser);
 				if (parseGuid == false)
 				{
-					return new BadRequestObjectResult(new { error = "Id User invalid !!" });
+					return new BadRequestObjectResult(new { msg = "Id User invalid !!" });
 				}
 				var user = await db.Users.FindAsync(idUser);
 				if (user == null)
 				{
-					return new BadRequestObjectResult(new { error = "Id User does not exist !!" });
+					return new BadRequestObjectResult(new { msg = "Id User does not exist !!" });
 				}
 				var password = RandomHelper.RandomDefaultPassword(12);
 				var mailHelper = new MailHelper(configuration);
@@ -385,18 +385,18 @@ public class UserServiceImpl : UserService
 				var check = mailHelper.Send(configuration["Gmail:Username"], user.Email, "Reset password account CDExcellent", content);
 				if (!check)
 				{
-					return new BadRequestObjectResult(new { error = "Email sending failed." });
+					return new BadRequestObjectResult(new { msg = "Email sending failed." });
 				}
 				var hashPassword = BCrypt.Net.BCrypt.HashPassword(password);
 				user.Password = hashPassword;
 				db.Entry(user).State = EntityState.Modified;
 				if (await db.SaveChangesAsync() > 0)
 				{
-					return new OkObjectResult(new { msg = "Reset password success !!" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Reset password failure !!" });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 			}
 			else
@@ -407,7 +407,7 @@ public class UserServiceImpl : UserService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 }

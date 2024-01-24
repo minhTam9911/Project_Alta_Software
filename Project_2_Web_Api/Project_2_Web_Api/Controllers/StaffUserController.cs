@@ -22,22 +22,12 @@ public class StaffUserController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpGet("find-all")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> GetAll()
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await staffUserService.FindAll());
 		}
 		catch (Exception ex)
@@ -49,22 +39,12 @@ public class StaffUserController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpGet("find-by-id/{id}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> GetById(string id)
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await staffUserService.FindById(id));
 		}
 		catch (Exception ex)
@@ -76,22 +56,12 @@ public class StaffUserController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpGet("find-by-name/{name}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> GetByName(string name)
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await staffUserService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -103,84 +73,39 @@ public class StaffUserController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPost("create")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> Create([FromBody] StaffUserDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
 		return await staffUserService.Create(request);
 	}
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("update/{id}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> Update(string id, [FromBody] StaffUserDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await staffUserService.Update(id, request);
 	}
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpDelete("delete/{id}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> Delete(string id)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if(await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await staffUserService.Delete(id);
 	}
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("reset-password")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await staffUserService.ResetPassword(request.Id);
 	}
 	[Produces("application/json")]
@@ -190,6 +115,14 @@ public class StaffUserController : ControllerBase
 	{
 		try
 		{
+			if(await userServiceAccessor.IsGuest())
+			{
+				return Unauthorized();
+			}
+			if(await userServiceAccessor.IsDistributor())
+			{
+				return Unauthorized();
+			}
 			return Ok(await userServiceAccessor.GetByMe());
 		}
 		catch (Exception ex)
@@ -200,6 +133,7 @@ public class StaffUserController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("setting-permission")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> SettingPermission([FromBody] SettingPermissionRequest request)
 	{
 		try

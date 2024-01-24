@@ -37,22 +37,23 @@ public class CommentServiceImpl : CommentService
 			}
 			else
 			{
+				comment.ParentCommentId = 0;
 				comment.AccountId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name));
 				db.Comments.Add(comment);
 				if(await db.SaveChangesAsync() > 0)
 				{
-					return new OkObjectResult(new { msg = "Create Success" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "create fail" });
+					return new BadRequestObjectResult(new { msg = false });
 				
 			}
 			}
 		}
 		catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new {error = ex.Message});
+			return new BadRequestObjectResult(new {msg = ex.Message});
 		}
 	}
 
@@ -63,7 +64,7 @@ public class CommentServiceImpl : CommentService
 			var data = await db.Comments.FindAsync(id);
 			if (data == null)
 			{
-				return new BadRequestObjectResult(new { error = "Id does not exist" });
+				return new BadRequestObjectResult(new { msg = "Id does not exist" });
 			}
 			if (data.AccountId == Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name)) || (_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name).ToLower()== "Administrator".ToLower())){
 			
@@ -75,13 +76,13 @@ public class CommentServiceImpl : CommentService
 						db.SaveChangesAsync();
 						db.Comments.Remove(data);
 						db.SaveChangesAsync();
-						return new OkObjectResult(new { msg = "success" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
 						db.Comments.Remove(data);
 						db.SaveChangesAsync();
-						return new OkObjectResult(new { msg = "success" });
+						return new OkObjectResult(new { msg = false });
 					}
 				
 				
@@ -91,7 +92,7 @@ public class CommentServiceImpl : CommentService
 			
 		}catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -111,18 +112,18 @@ public class CommentServiceImpl : CommentService
 				db.Comments.Add(comment);
 				if (await db.SaveChangesAsync() > 0)
 				{
-					return new OkObjectResult(new { msg = "Create Success" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "create fail" });
+					return new BadRequestObjectResult(new { msg =false });
 
 				}
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -131,7 +132,7 @@ public class CommentServiceImpl : CommentService
 		try { 
 			if(await db.Comments.AnyAsync() ==false || await db.Comments.FirstOrDefaultAsync(x=>x.TaskId == idTask) == null)
 			{
-				return  new BadRequestObjectResult(new { error = "Data is null" });
+				return  new BadRequestObjectResult(new { msg = "Data is null" });
 			}
 			else
 			{
@@ -142,12 +143,12 @@ public class CommentServiceImpl : CommentService
 					parentComnentId = x.ParentCommentId,
 					comment = x.Comment1,
 					createDate = x.CreateDate,
-					createBy = userServiceAccessor.GetByName(x.AccountId)
+					createBy = userServiceAccessor.GetByName2(x.AccountId)
 				}).ToListAsync()) ;
 			}
 		}catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new {error = ex.Message});
+			return new BadRequestObjectResult(new {msg = ex.Message});
 		}
 	}
 }

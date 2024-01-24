@@ -58,11 +58,11 @@ public class PostServiceImpl : PostService
 					db.Posts.Add(post);
 					if (await db.SaveChangesAsync() > 0)
 					{
-						return new OkObjectResult(new { msg = "Create successfully", id = post.Id });
+						return new OkObjectResult(new { msg = true, id = post.Id });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Create failed" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 				}
 				else
@@ -72,11 +72,11 @@ public class PostServiceImpl : PostService
 			}
 		}catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new {error = ex.Message});
+			return new BadRequestObjectResult(new {msg = ex.Message});
 		}
 	}
 
-	public async Task<IActionResult> Update(int id, PostDTO postDTO, IFormFile filePath)
+	public async Task<IActionResult> Update(int id, PostDTO postDTO)
 	{
 		var modelState = _httpContextAccessor.HttpContext?.Items["MS_ModelState"] as ModelStateDictionary;
 		var post = mapper.Map<Post>(postDTO);
@@ -100,14 +100,6 @@ public class PostServiceImpl : PostService
 					{
 						return new UnauthorizedResult();
 					}
-					if (filePath == null)
-					{
-						return new BadRequestObjectResult(new { error = "file failed" });
-					}
-					if (!FileHelper.checkFile(filePath))
-					{
-						return new BadRequestObjectResult(new { error = "file Invalid" });
-					}
 					data.Title = post.Title;
 					data.ShortDescription = post.ShortDescription;
 					post.CreateBy = await userServiceAccessor.GetById();
@@ -117,11 +109,11 @@ public class PostServiceImpl : PostService
 					db.Entry(data).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
 					if (await db.SaveChangesAsync() > 0)
 					{
-						return new OkObjectResult(new { msg = "Create successfully" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Create failed" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 				}
 				else
@@ -132,7 +124,7 @@ public class PostServiceImpl : PostService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -147,7 +139,7 @@ public class PostServiceImpl : PostService
 				.ToListAsync();
 			if(data == null)
 			{
-				return new BadRequestObjectResult(new { error = "Data is null" });
+				return new BadRequestObjectResult(new { msg = "Data is null" });
 			}
 			else
 			{
@@ -168,7 +160,7 @@ public class PostServiceImpl : PostService
 			}
 		}catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -193,11 +185,11 @@ public class PostServiceImpl : PostService
 					db.Entry(data).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
 					if (await db.SaveChangesAsync() > 0)
 					{
-						return new OkObjectResult(new { msg = "Update staus successfully" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Update status failed" });
+						return new BadRequestObjectResult(new { msg =false });
 					}
 
 			}
@@ -218,7 +210,7 @@ public class PostServiceImpl : PostService
 		{
 			if (await db.Posts.AnyAsync() == false)
 			{
-				return new BadRequestObjectResult(new { error = "Data is null" });
+				return new BadRequestObjectResult(new { msg = "Data is null" });
 			}
 			else
 			{
@@ -239,7 +231,7 @@ public class PostServiceImpl : PostService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -250,7 +242,7 @@ public class PostServiceImpl : PostService
 			var data = await db.Posts.FindAsync(id);
 			if (data == null)
 			{
-				return new BadRequestObjectResult(new { error = "Id does not exist" });
+				return new BadRequestObjectResult(new { msg = "Id does not exist" });
 			}
 			else if (data.CreateBy != await userServiceAccessor.GetById() && !await userServiceAccessor.IsSystem())
 			{
@@ -262,11 +254,11 @@ public class PostServiceImpl : PostService
 				db.Posts.Remove(data);
 				if(await db.SaveChangesAsync() > 0)
 				{
-					return new OkObjectResult(new { msg = "delete success" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "delete fail" });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 			}
 			else
@@ -276,7 +268,7 @@ public class PostServiceImpl : PostService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -293,7 +285,7 @@ public class PostServiceImpl : PostService
 					var data = await db.Posts.FindAsync(item);
 					if (data == null)
 					{
-						return new BadRequestObjectResult(new { error = "Id does not exist" });
+						return new BadRequestObjectResult(new { msg = "Id does not exist" });
 					}
 					else if (data.CreateBy != await userServiceAccessor.GetById() && !await userServiceAccessor.IsSystem())
 					{
@@ -315,11 +307,11 @@ public class PostServiceImpl : PostService
 				}
 				if (count == id.Length)
 				{
-					return new OkObjectResult(new { msg = "delete all success" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new OkObjectResult(new { error = "There was an element that failed to delete" });
+					return new OkObjectResult(new { msg = false });
 				}
 			}
 			else
@@ -330,7 +322,7 @@ public class PostServiceImpl : PostService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -340,7 +332,7 @@ public class PostServiceImpl : PostService
 		{
 			if (await db.Posts.AnyAsync() == false)
 			{
-				return new BadRequestObjectResult(new { error = "Data is null" });
+				return new BadRequestObjectResult(new { msg = "Data is null" });
 			}
 			else
 			{
@@ -362,7 +354,7 @@ public class PostServiceImpl : PostService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -383,11 +375,11 @@ public class PostServiceImpl : PostService
 				}
 				if (filePath == null)
 				{
-					return new BadRequestObjectResult(new { error = "file failed" });
+					return new BadRequestObjectResult(new { msg = "file failed" });
 				}
 				if (!FileHelper.checkFile(filePath))
 				{
-					return new BadRequestObjectResult(new { error = "file Invalid" });
+					return new BadRequestObjectResult(new { msg = "file Invalid" });
 				}
 				var path = Path.Combine(webHostEnvironment.WebRootPath, "Post", data.FilePath);
 				if (data.FilePath != "no-image.jpg")
@@ -416,13 +408,10 @@ public class PostServiceImpl : PostService
 			}
 		}catch(Exception ex)
 		{
-			return new BadRequestResult();
+			return new BadRequestObjectResult(new {msg = ex.Message});
 		}
 		
 	}
 
-	public Task<IActionResult> Update(int id, PostDTO postDTO)
-	{
-		throw new NotImplementedException();
-	}
+	
 }

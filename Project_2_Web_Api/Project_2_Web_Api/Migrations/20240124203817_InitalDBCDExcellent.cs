@@ -213,7 +213,7 @@ namespace Project_2_Web_Api.Migrations
                     CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsStatus = table.Column<bool>(type: "bit", nullable: false),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PathOfTheArticle = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -256,6 +256,7 @@ namespace Project_2_Web_Api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VisitId = table.Column<int>(type: "int", nullable: false),
                     AssignedStaffUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReportingStaffUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -329,40 +330,6 @@ namespace Project_2_Web_Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Visits",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Calendar = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Time = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DistributorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    GuestOfVisitId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    PurposeOfVisit = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Visits", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Visits_Distributors_DistributorId",
-                        column: x => x.DistributorId,
-                        principalTable: "Distributors",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Visits_StaffUsers_CreateBy",
-                        column: x => x.CreateBy,
-                        principalTable: "StaffUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Visits_StaffUsers_GuestOfVisitId",
-                        column: x => x.GuestOfVisitId,
-                        principalTable: "StaffUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Comments",
                 columns: table => new
                 {
@@ -418,6 +385,46 @@ namespace Project_2_Web_Api.Migrations
                     table.PrimaryKey("PK_PhotoPathReporting", x => x.Id);
                     table.ForeignKey(
                         name: "FK_PhotoPathReporting_TaskForVisit_TaskForVisitId",
+                        column: x => x.TaskForVisitId,
+                        principalTable: "TaskForVisit",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Visits",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Calendar = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Time = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DistributorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    GuestOfVisitId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreateBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PurposeOfVisit = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TaskForVisitId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Visits", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Visits_Distributors_DistributorId",
+                        column: x => x.DistributorId,
+                        principalTable: "Distributors",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Visits_StaffUsers_CreateBy",
+                        column: x => x.CreateBy,
+                        principalTable: "StaffUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Visits_StaffUsers_GuestOfVisitId",
+                        column: x => x.GuestOfVisitId,
+                        principalTable: "StaffUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Visits_TaskForVisit_TaskForVisitId",
                         column: x => x.TaskForVisitId,
                         principalTable: "TaskForVisit",
                         principalColumn: "Id");
@@ -589,6 +596,11 @@ namespace Project_2_Web_Api.Migrations
                 name: "IX_Visits_GuestOfVisitId",
                 table: "Visits",
                 column: "GuestOfVisitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Visits_TaskForVisitId",
+                table: "Visits",
+                column: "TaskForVisitId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -624,10 +636,10 @@ namespace Project_2_Web_Api.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "TaskForVisit");
+                name: "Distributors");
 
             migrationBuilder.DropTable(
-                name: "Distributors");
+                name: "TaskForVisit");
 
             migrationBuilder.DropTable(
                 name: "StaffUsers");

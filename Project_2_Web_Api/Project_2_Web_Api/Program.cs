@@ -15,6 +15,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHostedService<BackgroundWorkerService>();
+builder.Services.AddInfrastructrue();
 builder.Services.AddEndpointsApiExplorer();
 /*builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
 builder.Services.AddTransient<SmsService, SmsServiceImpl>();*/
@@ -30,7 +31,7 @@ builder.Services.AddSwaggerGen(option =>
 	option.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 var connectString = builder.Configuration["Connection:DefaultString"];
-builder.Services.AddDbContext<DatabaseContext>(option => option.UseLazyLoadingProxies().UseSqlServer(connectString));
+builder.Services.AddDbContext<DatabaseContext>(option => option.UseLazyLoadingProxies().UseSqlServer(connectString), ServiceLifetime.Singleton);
 builder.Services.AddCors();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -51,7 +52,6 @@ builder.Services.AddScoped<CommentService,CommentServiceImpl>();
 builder.Services.AddScoped<PostService, PostServiceImpl>();
 builder.Services.AddScoped<MediaService, MediaServiceImpl>();
 builder.Services.AddScoped<NotificationService, NotificationServiceImpl>();
-//Debug.WriteLine(builder.Configuration.GetSection("AppSettings:Token").Value!);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>
 {
 	option.SaveToken = true;

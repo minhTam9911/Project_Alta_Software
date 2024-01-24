@@ -38,11 +38,11 @@ public class MediaServiceImpl : MediaService
 		{
 			if (filePath == null)
 			{
-				return new BadRequestObjectResult(new { error = "file failed" });
+				return new BadRequestObjectResult(new { msg = "file failed" });
 			}
 			if (!FileHelper.checkFileMedia(filePath))
 			{
-				return new BadRequestObjectResult(new { error = "file Invalid" });
+				return new BadRequestObjectResult(new { msg = "file Invalid" });
 			}
 			var media = new Media();
 			var fileName = FileHelper.generateFileName(filePath.FileName);
@@ -57,16 +57,16 @@ public class MediaServiceImpl : MediaService
 			db.Medias.Add(media);
 			if (await db.SaveChangesAsync() > 0)
 			{
-				return new OkObjectResult(new { msg = "Create successfully" });
+				return new OkObjectResult(new { msg = true});
 			}
 			else
 			{
-				return new BadRequestObjectResult(new { error = "Create failed" });
+				return new BadRequestObjectResult(new { msg = false });
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -77,7 +77,7 @@ public class MediaServiceImpl : MediaService
 			var data = await db.Medias.FindAsync(id);
 			if (data == null)
 			{
-				return new BadRequestObjectResult(new { error = "Id does not exist" });
+				return new BadRequestObjectResult(new { msg = "Id does not exist" });
 			}
 			else if (data.CreateBy != await userServiceAccessor.GetById() && !await userServiceAccessor.IsSystem())
 			{
@@ -90,18 +90,18 @@ public class MediaServiceImpl : MediaService
 				db.Medias.Remove(data);
 				if (await db.SaveChangesAsync() > 0)
 				{
-					return new OkObjectResult(new { msg = "delete success" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "delete fail" });
+					return new BadRequestObjectResult(new { msg = true });
 				}
 
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -117,7 +117,7 @@ public class MediaServiceImpl : MediaService
 			}).ToListAsync());
 		}catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -137,7 +137,7 @@ public class MediaServiceImpl : MediaService
 		}
 		catch (Exception ex)	
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 }

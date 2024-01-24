@@ -69,7 +69,7 @@ public class AuthServiceImpl : AuthService
 							}
 							else
 							{
-								return new BadRequestObjectResult(new { error = "System Error !" });
+								return new BadRequestObjectResult(new { msg = "System Error !" });
 							}
 
 						}
@@ -93,7 +93,7 @@ public class AuthServiceImpl : AuthService
 					}
 					else
 					{
-						return new BadRequestObjectResult(new {error = "Email or Passwords is invalid" });
+						return new BadRequestObjectResult(new {msg = "Email or Passwords is invalid" });
 					}
 
 				}
@@ -124,7 +124,7 @@ public class AuthServiceImpl : AuthService
 							}
 							else
 							{
-								return new BadRequestObjectResult(new { error = "System Error !" });
+								return new BadRequestObjectResult(new { msg = "System Error !" });
 							}
 
 						}
@@ -143,13 +143,13 @@ public class AuthServiceImpl : AuthService
 							}
 							else
 							{
-								return new BadRequestObjectResult(new { error = "System Error !" });
+								return new BadRequestObjectResult(new { msg = "System Error !" });
 							}
 						}
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Email or Passwords is invalid" });
+						return new BadRequestObjectResult(new { msg = "Email or Passwords is invalid" });
 					}
 				}
 				var data3 = await db.Distributors.AsNoTracking().FirstOrDefaultAsync(x => x.Email == userAccessorDTO.Username);
@@ -177,7 +177,7 @@ public class AuthServiceImpl : AuthService
 							}
 							else
 							{
-								return new BadRequestObjectResult(new { error = "System Error !" });
+								return new BadRequestObjectResult(new { msg = "System Error !" });
 							}
 						}
 						else
@@ -193,24 +193,24 @@ public class AuthServiceImpl : AuthService
 							}
 							else
 							{
-								return new BadRequestObjectResult(new { error = "System Error !" });
+								return new BadRequestObjectResult(new { msg = "System Error !" });
 							}
 						}
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Email or Passwords is invalid" });
+						return new BadRequestObjectResult(new { msg = "Email or Passwords is invalid" });
 					}
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Username not found" });
+					return new BadRequestObjectResult(new { msg = "Username not found" });
 				}
 			}
 		}
 		catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 	private string CreateToken(Guid id, string role)

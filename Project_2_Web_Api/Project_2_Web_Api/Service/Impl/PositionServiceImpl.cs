@@ -34,29 +34,29 @@ public class PositionServiceImpl : PositionService
 				{
 					if (await db.PositionGroups.FindAsync(position.PositionGroupId) == null)
 					{
-						return new BadRequestObjectResult(new { error = "Position Group not exist!" });
+						return new BadRequestObjectResult(new { msg = "Position Group not exist!" });
 					}
 
 					if (await db.Positions.FirstOrDefaultAsync(x => x.Name.ToLower() == position.Name.ToLower()) != null)
 					{
-						return new BadRequestObjectResult(new { error = "Name Position already exist!" });
+						return new BadRequestObjectResult(new { msg = "Name Position already exist!" });
 					}
 					position.Created = DateTime.Now;
 					db.Positions.Add(position);
 					int check = await db.SaveChangesAsync();
 					if (check > 0)
 					{
-						return new OkObjectResult(new { msg = "Added successfully!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Added failure!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 				}
 		}
 		catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -76,16 +76,16 @@ public class PositionServiceImpl : PositionService
 				{
 					if(await db.Positions.FindAsync(id) == null)
 					{
-						return new BadRequestObjectResult(new { error = "Id does not exist! " });
+						return new BadRequestObjectResult(new { msg = "Id does not exist! " });
 					}
 					
 					if (await db.Positions.Where(x => x.Name == position.Name && x.Id != id).AnyAsync())
 					{
-							return new BadRequestObjectResult(new { error = "Name Position already exist!" });
+							return new BadRequestObjectResult(new { msg = "Name Position already exist!" });
 					}
 					if(await db.PositionGroups.FindAsync(position.PositionGroupId) == null)
 				{
-					return new BadRequestObjectResult(new { error = "Position Group does not exist!" });
+					return new BadRequestObjectResult(new { msg = "Position Group does not exist!" });
 				}
 					var data = await db.Positions.FindAsync(id);
 					data.Name = position.Name;
@@ -94,11 +94,11 @@ public class PositionServiceImpl : PositionService
 					int check = await db.SaveChangesAsync();
 					if (check > 0)
 					{
-						return new OkObjectResult(new { msg = "Update successfully!" });
+						return new OkObjectResult(new { msg = true });
 					}
 					else
 					{
-						return new BadRequestObjectResult(new { error = "Update failure!" });
+						return new BadRequestObjectResult(new { msg = false });
 					}
 			}
 		}
@@ -114,7 +114,7 @@ public class PositionServiceImpl : PositionService
 		{
 			if (await db.Positions.FindAsync(id) == null)
 			{
-				return new BadRequestObjectResult(new { error = "Id does not exist!" });
+				return new BadRequestObjectResult(new { msg = "Id does not exist!" });
 			}
 			else
 			{
@@ -122,17 +122,17 @@ public class PositionServiceImpl : PositionService
 				var check = await db.SaveChangesAsync();
 				if (check > 0)
 				{
-					return new OkObjectResult(new { msg = "Delete Successfully!" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 			}
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex });
+			return new BadRequestObjectResult(new { error = ex.Message });
 		}
 	}
 
@@ -158,7 +158,7 @@ public class PositionServiceImpl : PositionService
 		}
 		catch (Exception ex)
 		{
-			return new { error = ex.Message };
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -183,7 +183,7 @@ public class PositionServiceImpl : PositionService
 		}
 		catch (Exception ex)
 		{
-			return new { error = ex.Message };
+			return new { msg = ex.Message };
 		}
 	}
 
@@ -209,7 +209,7 @@ public class PositionServiceImpl : PositionService
 		}
 		catch (Exception ex)
 		{
-			return new { error = ex.Message };
+			return new { msg = ex.Message };
 		}
 	}
 }

@@ -10,6 +10,7 @@ namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
+[Authorize(Roles = "Administrator,Owner")]
 public class PositionGroupController : ControllerBase
 {
 
@@ -29,18 +30,7 @@ public class PositionGroupController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return  Ok( await positionGroupService.FindAll());
 		}
 		catch(Exception ex)
@@ -58,18 +48,7 @@ public class PositionGroupController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
+			
 			return Ok(await positionGroupService.FindById(id));
 		}
 		catch (Exception ex)
@@ -85,18 +64,6 @@ public class PositionGroupController : ControllerBase
 	{
 		try
 		{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsDistributor())
-			{
-				return Unauthorized();
-			}
-			if (await userServiceAccessor.IsSales())
-			{
-				return Unauthorized();
-			}
 			return Ok(await positionGroupService.FindByName(name));
 		}
 		catch (Exception ex)
@@ -111,18 +78,7 @@ public class PositionGroupController : ControllerBase
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody]PositionGroupDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await positionGroupService.Create(request);
 	}
 	
@@ -132,18 +88,7 @@ public class PositionGroupController : ControllerBase
 	[HttpPut("update/{id}")]
 	public async Task<IActionResult> Update(string id, [FromBody] PositionGroupDTO request)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await positionGroupService.Update(id, request);
 	}
 
@@ -154,18 +99,7 @@ public class PositionGroupController : ControllerBase
 	[HttpDelete("delete/{id}")]
 	public async Task<IActionResult> Delete(string id)
 	{
-		if (await userServiceAccessor.IsGuest())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsDistributor())
-		{
-			return Unauthorized();
-		}
-		if (await userServiceAccessor.IsSales())
-		{
-			return Unauthorized();
-		}
+		
 		return await positionGroupService.Delete(id);
 	}
 }

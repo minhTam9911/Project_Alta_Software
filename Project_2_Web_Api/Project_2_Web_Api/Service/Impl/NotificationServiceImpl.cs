@@ -85,7 +85,7 @@ public class NotificationServiceImpl : NotificationService
 					}
 					if (count > 0)
 					{
-						return new BadRequestObjectResult(new { error = "A total of " + count + " people could not send" });
+						return new BadRequestObjectResult(new { msg = "A total of " + count + " people could not send" });
 					}
 					else
 					{
@@ -154,7 +154,7 @@ public class NotificationServiceImpl : NotificationService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -164,7 +164,7 @@ public class NotificationServiceImpl : NotificationService
 		{
 			if(await db.Notifications.AnyAsync() == false)
 			{
-				return new BadRequestObjectResult(new { error = "data null" });
+				return new BadRequestObjectResult(new { msg = "data is null" });
 			}
 			if (await userServiceAccessor.IsSystem())
 			{
@@ -201,7 +201,7 @@ public class NotificationServiceImpl : NotificationService
 			
 		}catch(Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -211,7 +211,7 @@ public class NotificationServiceImpl : NotificationService
 		{
 			if (await db.Notifications.AnyAsync() == false)
 			{
-				return new BadRequestObjectResult(new { error = "data null" });
+				return new BadRequestObjectResult(new { msg = "data null" });
 			}
 			var outPut = new List<Notification>();
 			var data = await db.Notifications.ToListAsync();
@@ -281,7 +281,7 @@ public class NotificationServiceImpl : NotificationService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
@@ -291,7 +291,7 @@ public class NotificationServiceImpl : NotificationService
 		{
 			if (await db.Notifications.FindAsync(id) == null)
 			{
-				return new BadRequestObjectResult(new { error = "id does not exist!" });
+				return new BadRequestObjectResult(new { msg = "id does not exist!" });
 			}
 			if(await userServiceAccessor.IsSystem())
 			{
@@ -299,11 +299,11 @@ public class NotificationServiceImpl : NotificationService
 				var check = db.SaveChangesAsync();
 				if (await check > 0)
 				{
-					return new OkObjectResult(new { msg = "Delete Successfully!" });
+					return new OkObjectResult(new { msg = true });
 				}
 				else
 				{
-					return new BadRequestObjectResult(new { error = "Delete Failed!" });
+					return new BadRequestObjectResult(new { msg = false });
 				}
 			}
 			else
@@ -313,19 +313,17 @@ public class NotificationServiceImpl : NotificationService
 		}
 		catch (Exception ex)
 		{
-			return new BadRequestObjectResult(new { error = ex.Message });
+			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
 
 	public  async void SendAutoNotificationVisit()
 	{
-		/*try
+		try
 		{
 			var data = await db.Visits.Where(x => (x.Calendar.Value.Date == DateTime.Now.Date) && x.Status.ToLower() == "Chưa Thăm Viếng".ToLower()).ToListAsync();
 			if (data != null)
 			{
-
-
 				foreach (var i in data)
 				{
 					string content = "On " + i.Calendar + ", " + i.Time + " you are scheduled to visit our company. We are very honored and pleased to welcome you.";
@@ -342,6 +340,6 @@ public class NotificationServiceImpl : NotificationService
 		catch(Exception ex)
 		{
 			Debug.WriteLine(ex.Message);
-		}*/
+		}
 	}
 }

@@ -12,6 +12,8 @@ public class TaskForVisit
 	[Required]
 	public string? Title { get; set; }
 	[Required]
+	public int? VisitId { get; set; }
+	[Required]
 	public  Guid? AssignedStaffUserId {  get; set; }
 	[Required]
 	public  Guid? ReportingStaffUserId {  get; set; }
@@ -25,7 +27,7 @@ public class TaskForVisit
 	public Guid? CreateBy { get; set; }
 	
 	public string? Status { get; set; }
-
+	public virtual List<Visit>? Visits { get; set; } = new List<Visit>();
 	public virtual List<Comment>? Comments { get; set; }
 	public virtual ICollection<PhotoPathAssigned>? PhotoPathAssigned { get; set; } = new List<PhotoPathAssigned>();
 	public virtual ICollection<PhotoPathReporting>? PhotoPathReporting { get; set; } = new List<PhotoPathReporting>();
