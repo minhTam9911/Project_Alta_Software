@@ -59,7 +59,7 @@ public class TaskForVisitController : ControllerBase
 
 	[Produces("application/json")]
 	[Consumes("multipart/form-data")]
-	[HttpPost("upload-all-file/{id}")]
+	[HttpPut("upload-all-file/{id}")]
 	public async Task<IActionResult> UploadAllFile(int id, IFormFile[] fileAssigned, IFormFile[] fileReport)
 	{
 		return await taskForVisitService.UploadFile(id,fileAssigned,fileReport);
@@ -68,7 +68,7 @@ public class TaskForVisitController : ControllerBase
 
 	[Produces("application/json")]
 	[Consumes("multipart/form-data")]
-	[HttpPost("upload-report-file/{id}/{status}")]
+	[HttpPut("upload-report-file/{id}/{status}")]
 	public async Task<IActionResult> UploadReportFile(int id, IFormFile[] fileReport, string? status)
 	{
 		return await taskForVisitService.UploadFileTaskForMe(id, fileReport,status);

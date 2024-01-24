@@ -268,12 +268,15 @@ public class AuthServiceImpl : AuthService
 		return result;
 	}
 
-	public async Task<string> RefreshTokenAsync(RefreshTokenRequest refreshTokenRequest)
+	public async Task<bool> RefreshTokenAsync(RefreshTokenRequest refreshTokenRequest)
 	{
 		var check = await db.ApiTokens.FirstOrDefaultAsync(x => x.RefreshToken == refreshTokenRequest.RefreshToken);
-		if (check != null && check.Exipres < DateTime.Now)
+		if (check != null && check.Exipres > DateTime.Now)
 		{
-			if (await db.Users.FindAsync(check.UserId) != null)
+			return true;
+
+			#region
+			/*if (await db.Users.FindAsync(check.UserId) != null)
 			{
 				var database = await db.Users.FindAsync(check.UserId);
 				return CreateToken(database.Id, database.Position.Name);
@@ -291,12 +294,37 @@ public class AuthServiceImpl : AuthService
 			else
 			{
 				return string.Empty;
-			}
+			}*/
+			#endregion
+		}
+		if (check.Exipres < DateTime.Now)
+		{
+			db.ApiTokens.Remove(check);
+			await db.SaveChangesAsync();
+			return false;
 		}
 		else
 		{
-			return string.Empty;
+			return false;
 		}
 	}
-	
+
+	public async Task<string> GenerrateJwt(Guid id, string role)
+	{
+		return CreateToken(id, role);
+	}
+
+	public async Task<bool> RevokeToken(Guid id)
+	{
+		if(await db.ApiTokens.FindAsync(id) == null)
+		{
+			return false;
+		}
+		else
+		{
+			db.ApiTokens.Remove(await db.ApiTokens.FindAsync(id));
+			await db.SaveChangesAsync();
+			return true;
+		}
+	}
 }

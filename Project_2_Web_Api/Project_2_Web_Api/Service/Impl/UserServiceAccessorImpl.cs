@@ -16,7 +16,7 @@ public class UserServiceAccessorImpl : UserServiceAccessor
 		_httpContextAccessor = httpContextAccessor;
 		this.db = db;
 	}
-	 public async Task<bool> CheckPermission(string permission)
+	public async Task<bool> CheckPermission(string permission)
 	{
 		try
 		{
@@ -75,8 +75,6 @@ public class UserServiceAccessorImpl : UserServiceAccessor
 			return false;
 		}
 	}
-
-	
 
 	public Task<bool> IsGuest()
 	{
@@ -337,6 +335,44 @@ public class UserServiceAccessorImpl : UserServiceAccessor
 					return data2.FullName;
 				}
 				var data3 = await db.Distributors.FindAsync(id);
+				if (data3 != null)
+				{
+					return data3.Name;
+				}
+				else
+				{
+					return null;
+				}
+
+			}
+			else
+			{
+				return null;
+			}
+		}
+		catch (Exception ex)
+		{
+			return null;
+		}
+	}
+
+	public string GetByName2(Guid? id)
+	{
+		try
+		{
+			if (_httpContextAccessor.HttpContext != null)
+			{
+				var data =  db.StaffUsers.Find(id);
+				if (data != null)
+				{
+					return data.Fullname;
+				}
+				var data2 =  db.Users.Find(id);
+				if (data2 != null)
+				{
+					return data2.FullName;
+				}
+				var data3 =  db.Distributors.Find(id);
 				if (data3 != null)
 				{
 					return data3.Name;

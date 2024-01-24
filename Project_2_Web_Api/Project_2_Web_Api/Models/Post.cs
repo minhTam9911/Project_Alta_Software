@@ -16,7 +16,6 @@ public partial class Post
 	public Guid? CreateBy { get;set; }	
 	public DateTime? CreateDate { get; set; }	
 	public bool IsStatus { get; set; }
-	[Required]
 	public string? FilePath { get; set; }
 	[Required]
 	public string? PathOfTheArticle { get; set; }

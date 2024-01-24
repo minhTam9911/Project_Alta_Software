@@ -14,4 +14,5 @@ public interface UserServiceAccessor
 	Task<dynamic> GetByMe();
 	Task<Guid?> GetById();
 	Task<string?> GetByName(Guid? id);
+	string GetByName2(Guid? id);
 }

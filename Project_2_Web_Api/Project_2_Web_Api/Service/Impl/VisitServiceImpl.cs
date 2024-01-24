@@ -115,8 +115,8 @@ public class VisitServiceImpl : VisitService
 						},
 						guestOfVisit = x.GuestOfVisit== null? null: new
 						{
-							id = x.GuestOfVisit,
-							fullname = x.StaffUser.Fullname
+							id = x.GuestOfVisitId,
+							fullname = x.GuestOfVisit.Fullname
 						},
 						createBy = new
 						{
@@ -183,7 +183,8 @@ public class VisitServiceImpl : VisitService
 		{
 			using (var dbContext = this.db)
 			{
-				IQueryable<Visit> query = dbContext.Visits;
+				IQueryable<Visit> query = dbContext.Visits.Include(v => v.Distributor).Include(v => v.GuestOfVisit).Include(v => v.StaffUser);
+
 				if (startDate != null)
 				{
 					query = query.Where(v => v.Calendar >= startDate);
@@ -218,8 +219,8 @@ public class VisitServiceImpl : VisitService
 					},
 					guestOfVisit = x.GuestOfVisit == null ? null : new
 					{
-						id = x.GuestOfVisit,
-						fullname = x.StaffUser.Fullname
+						id = x.GuestOfVisitId,
+						fullname = x.GuestOfVisit.Fullname
 					},
 					createBy = new
 					{
@@ -245,7 +246,7 @@ public class VisitServiceImpl : VisitService
 			{
 				return new OkObjectResult(new { error = "Data is null !" });
 			}
-			if (await db.Visits.FindAsync(id) != null)
+			if (await db.Visits.FindAsync(id) == null)
 			{
 				return new OkObjectResult(new { error = "Id does not exist !" });
 			}
@@ -265,8 +266,8 @@ public class VisitServiceImpl : VisitService
 						},
 						guestOfVisit = x.GuestOfVisit == null ? null : new
 						{
-							id = x.GuestOfVisit,
-							fullname = x.StaffUser.Fullname
+							id = x.GuestOfVisitId,
+							fullname = x.GuestOfVisit.Fullname
 						},
 						createBy = new
 						{
@@ -318,8 +319,8 @@ public class VisitServiceImpl : VisitService
 						},
 						guestOfVisit = x.GuestOfVisit == null ? null : new
 						{
-							id = x.GuestOfVisit,
-							fullname = x.StaffUser.Fullname
+							id = x.GuestOfVisitId,
+							fullname = x.GuestOfVisit.Fullname
 						},
 						createBy = new
 						{
@@ -370,8 +371,8 @@ public class VisitServiceImpl : VisitService
 						},
 						guestOfVisit = x.GuestOfVisit == null ? null : new
 						{
-							id = x.GuestOfVisit,
-							fullname = x.StaffUser.Fullname
+							id = x.GuestOfVisitId,
+							fullname = x.GuestOfVisit.Fullname
 						},
 						createBy = new
 						{
@@ -398,8 +399,8 @@ public class VisitServiceImpl : VisitService
 						},
 						guestOfVisit = x.GuestOfVisit == null ? null : new
 						{
-							id = x.GuestOfVisit,
-							fullname = x.StaffUser.Fullname
+							id = x.GuestOfVisitId,
+							fullname = x.GuestOfVisit.Fullname
 						},
 						createBy = new
 						{
@@ -425,8 +426,8 @@ public class VisitServiceImpl : VisitService
 						},
 						guestOfVisit = x.GuestOfVisit == null ? null : new
 						{
-							id = x.GuestOfVisit,
-							fullname = x.StaffUser.Fullname
+							id = x.GuestOfVisitId,
+fullname = x.GuestOfVisit.Fullname
 						},
 						createBy = new
 						{
@@ -455,7 +456,7 @@ public class VisitServiceImpl : VisitService
 			{
 				return new OkObjectResult(new { error = "Data is null !" });
 			}
-			if (await db.Visits.FindAsync(id) != null)
+			if (await db.Visits.FindAsync(id) == null)
 			{
 				return new OkObjectResult(new { error = "Id does not exist !" });
 			}
@@ -475,8 +476,8 @@ public class VisitServiceImpl : VisitService
 						},
 						guestOfVisit = x.GuestOfVisit == null ? null : new
 						{
-							id = x.GuestOfVisit,
-							fullname = x.StaffUser.Fullname
+							id = x.GuestOfVisitId,
+							fullname = x.GuestOfVisit.Fullname
 						},
 						createBy = new
 						{
@@ -509,7 +510,7 @@ public class VisitServiceImpl : VisitService
 			{
 				return new OkObjectResult(
 					await db.Visits.Where(x=>
-					(x.Status.ToLower()!="Đã Viếng thăm".ToLower() || x.Status.ToLower()!="Đã Hủy".ToLower()) && x.Calendar >= DateTime.Now)
+					(x.Status.ToLower()!="Đã Viếng thăm".ToLower() && x.Calendar >= DateTime.Now) ||( x.Status.ToLower()!="Đã Hủy".ToLower() && x.Calendar >= DateTime.Now))
 					.Select(x => new
 					{
 						id = x.Id,
@@ -523,8 +524,8 @@ public class VisitServiceImpl : VisitService
 						},
 						guestOfVisit = x.GuestOfVisit == null ? null : new
 						{
-							id = x.GuestOfVisit,
-							fullname = x.StaffUser.Fullname
+							id = x.GuestOfVisitId,
+							fullname = x.GuestOfVisit.Fullname
 						},
 						createBy = new
 						{

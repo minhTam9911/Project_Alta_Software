@@ -197,7 +197,10 @@ public class AreaServiceImpl : AreaService
 			{
 				if (await userServiceAccessor.CheckPermission("Delete areas") || await userServiceAccessor.IsSystem())
 				{
-					db.Areas.Remove(await db.Areas.FindAsync(id));
+					var data = await db.Areas.FindAsync(id);
+					data.StaffUsers.Clear();
+					data.Distributors.Clear();
+					db.Areas.Remove(data);
 					var check = await db.SaveChangesAsync();
 					if (check > 0)
 					{

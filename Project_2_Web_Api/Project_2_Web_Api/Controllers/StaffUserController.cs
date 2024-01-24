@@ -197,4 +197,20 @@ public class StaffUserController : ControllerBase
 			return BadRequest(new { error = ex.Message });
 		}
 	}
+	[Produces("application/json")]
+	[Consumes("application/json")]
+	[HttpPut("setting-permission")]
+	public async Task<IActionResult> SettingPermission([FromBody] SettingPermissionRequest request)
+	{
+		try
+		{
+
+			return await staffUserService.SettingPermission(request.Id, request.PermissionId);
+		}
+		catch (Exception ex)
+		{
+			return BadRequest(ex.Message);
+		}
+
+	}
 }

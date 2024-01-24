@@ -64,18 +64,19 @@ public class NotificationServiceImpl : NotificationService
 					var count = 0;
 					foreach (var i in notificationDTO.Receiver)
 					{
+						var id = Guid.Parse(i);
 
-						if (await db.Users.FindAsync(i) != null)
+						if (await db.Users.FindAsync(id) != null)
 						{
-							notification.User.Add(await db.Users.FindAsync(i));
+							notification.User.Add(await db.Users.FindAsync(id));
 						}
-						else if (await db.StaffUsers.FindAsync(i) != null)
+						else if (await db.StaffUsers.FindAsync(id) != null)
 						{
-							notification.StaffUsers.Add(await db.StaffUsers.FindAsync(i));
+							notification.StaffUsers.Add(await db.StaffUsers.FindAsync(id));
 						}
-						else if (await db.Distributors.FindAsync(i) != null)
+						else if (await db.Distributors.FindAsync(id) != null)
 						{
-							notification.Distributors.Add(await db.Distributors.FindAsync(i));
+							notification.Distributors.Add(await db.Distributors.FindAsync(id));
 						}
 						else
 						{
@@ -172,7 +173,7 @@ public class NotificationServiceImpl : NotificationService
 					id = x.Id,
 					title = x.Title,
 					content = x.Content,
-					createBy  =  userServiceAccessor.GetByName(x.CreateBy),
+					createBy  =  userServiceAccessor.GetByName2(x.CreateBy),
 					receiverUser = x.User == null? null: x.User.Select(i => new
 					{
 						id = i.Id,
@@ -318,9 +319,9 @@ public class NotificationServiceImpl : NotificationService
 
 	public  async void SendAutoNotificationVisit()
 	{
-		try
+		/*try
 		{
-			var data = await db.Visits.Where(x => (x.Calendar.Value.ToString("dd-MM-yyyy") == DateTime.Now.ToString("dd-MM-yyyy")) && x.Status.ToLower() == "Chưa Thăm Viếng".ToLower()).ToListAsync();
+			var data = await db.Visits.Where(x => (x.Calendar.Value.Date == DateTime.Now.Date) && x.Status.ToLower() == "Chưa Thăm Viếng".ToLower()).ToListAsync();
 			if (data != null)
 			{
 
@@ -341,6 +342,6 @@ public class NotificationServiceImpl : NotificationService
 		catch(Exception ex)
 		{
 			Debug.WriteLine(ex.Message);
-		}
+		}*/
 	}
 }

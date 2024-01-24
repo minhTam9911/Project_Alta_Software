@@ -71,9 +71,9 @@ public class VisitController : ControllerBase
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
-	[HttpDelete("delete/{id}")]
-	public async Task<IActionResult> Delete(int id)
+	[HttpGet("history-visiting-schedule")]
+	public async Task<IActionResult> HistoryVisitingSchedule()
 	{
-		return await visitService.Delete(id);
+		return await visitService.HistoryVisitingSchedule();
 	}
 }

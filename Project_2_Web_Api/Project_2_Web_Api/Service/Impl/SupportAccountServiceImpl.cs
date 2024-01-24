@@ -34,7 +34,7 @@ public class SupportAccountServiceImpl : SupportAccountService
 
 			if (await userServiceAccessor.IsGuest())
 			{
-				var data = await db.Users.FindAsync(userServiceAccessor.GetById());
+				var data = await db.Users.FindAsync(await userServiceAccessor.GetById());
 				if (!BCrypt.Net.BCrypt.Verify(oldPassword, data.Password))
 				{
 					return new BadRequestObjectResult(new { error = "The old password does not match the new password!!" });
@@ -53,7 +53,7 @@ public class SupportAccountServiceImpl : SupportAccountService
 			}
 			else if (await userServiceAccessor.IsDistributor())
 			{
-				var data = await db.Distributors.FindAsync(userServiceAccessor.GetById());
+				var data = await db.Distributors.FindAsync(await userServiceAccessor.GetById());
 				if (!BCrypt.Net.BCrypt.Verify(oldPassword, data.Password))
 				{
 					return new BadRequestObjectResult(new { error = "The old password does not match the new password!!" });
@@ -72,7 +72,7 @@ public class SupportAccountServiceImpl : SupportAccountService
 			}
 			else
 			{
-				var data = await db.StaffUsers.FindAsync(userServiceAccessor.GetById());
+				var data = await db.StaffUsers.FindAsync( await userServiceAccessor.GetById());
 				if (!BCrypt.Net.BCrypt.Verify(oldPassword, data.Password))
 				{
 					return new BadRequestObjectResult(new { error = "The old password does not match the new password!!" });

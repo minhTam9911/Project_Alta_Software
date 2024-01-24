@@ -210,8 +210,16 @@ public class DistributorController : ControllerBase
 	public async Task<IActionResult> GetMe()
 	{
 		try
-		{
-			return Ok(await userServiceAccessor.GetByMe());
+		{ 
+			if(await userServiceAccessor.IsDistributor())
+			{
+				return Ok(await userServiceAccessor.GetByMe());
+			}
+			else
+			{
+				return Unauthorized();
+			}
+			
 		}
 		catch (Exception ex)
 		{

@@ -118,6 +118,14 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 							id = x.ReportingStaffUserId,
 							name = x.StaffUserReposter.Fullname
 						},
+						photoPathAssigned = x.PhotoPathAssigned == null? null : x.PhotoPathAssigned.Select(i => new
+						{
+							fileName = configuration["BaseUrl"] + "TaskForVisit/"+i.Path
+						}),
+						photoPathReporting = x.PhotoPathReporting == null ? null : x.PhotoPathReporting.Select(i => new
+						{
+							fileName = configuration["BaseUrl"] + "TaskForVisit/" + i.Path
+						}),
 						description = x.Description,
 						startDate = x.StartDate,
 						endDate = x.EndDate,
@@ -186,7 +194,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 				}
 				else;
 				return new OkObjectResult(
-					await db.TaskForVisit.Where(x => x.AssignedStaffUserId == Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name))).Select(x => new
+					await db.TaskForVisit.Select(x => new
 					{
 						id = x.Id,
 						title = x.Title,
@@ -238,7 +246,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 				else if (await userServiceAccessor.IsSales())
 				{
 					return new OkObjectResult(
-					await db.TaskForVisit.Where(x => x.AssignedStaffUserId == Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name))).Select(x => new
+					await db.TaskForVisit.Where(x => x.Id ==id).Select(x => new
 					{
 						id = x.Id,
 						title = x.Title,
@@ -268,7 +276,7 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 				}
 				else;
 				return new OkObjectResult(
-					await db.TaskForVisit.Where(x => x.AssignedStaffUserId == Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name))).Select(x => new
+					await db.TaskForVisit.Where(x => x.Id == id).Select(x => new
 					{
 						id = x.Id,
 						title = x.Title,
@@ -309,40 +317,17 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 			}
 			else
 			{
-			if (await userServiceAccessor.IsGuest())
-			{
-				return new UnauthorizedResult();
-			}
-			else if (await userServiceAccessor.IsDistributor())
-			{
-					return new UnauthorizedResult();
-			}
-			else if (await userServiceAccessor.IsSales())
-			{
-				return new OkObjectResult(
-				await db.TaskForVisit.Where(x => x.AssignedStaffUserId == Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name))).Select(x => new
+				if (await userServiceAccessor.IsGuest())
 				{
-					id = x.Id,
-					title = x.Title,
-					assignedStaffUser = new
-					{
-						id = x.AssignedStaffUserId,
-						name = x.StaffUserAssignee.Fullname
-					},
-					reportStaffUser = new
-					{
-						id = x.ReportingStaffUserId,
-						name = x.StaffUserReposter.Fullname
-					},
-					description = x.Description,
-					startDate = x.StartDate,
-					endDate = x.EndDate,
-
-				}).ToListAsync()
-				);
-			}
-			else;
-				return new OkObjectResult(
+					return new UnauthorizedResult();
+				}
+				else if (await userServiceAccessor.IsDistributor())
+				{
+					return new UnauthorizedResult();
+				}
+				else if (await userServiceAccessor.IsSales())
+				{
+					return new OkObjectResult(
 					await db.TaskForVisit.Where(x => x.AssignedStaffUserId == Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name))).Select(x => new
 					{
 						id = x.Id,
@@ -363,6 +348,31 @@ public class TaskForVisitServiceImpl : TaskForVisitService
 
 					}).ToListAsync()
 					);
+				}
+				else
+				{
+					return new OkObjectResult(
+						await db.TaskForVisit.Where(x => x.AssignedStaffUserId == Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name))).Select(x => new
+						{
+							id = x.Id,
+							title = x.Title,
+							assignedStaffUser = new
+							{
+								id = x.AssignedStaffUserId,
+								name = x.StaffUserAssignee.Fullname
+							},
+							reportStaffUser = new
+							{
+								id = x.ReportingStaffUserId,
+								name = x.StaffUserReposter.Fullname
+							},
+							description = x.Description,
+							startDate = x.StartDate,
+							endDate = x.EndDate,
+
+						}).ToListAsync()
+						);
+				}
 			}
 	}
 		catch (Exception ex)

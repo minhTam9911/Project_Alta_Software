@@ -6,5 +6,7 @@ namespace Project_2_Web_Api.Service;
 public interface AuthService
 {
 	Task<IActionResult> Login(UserAccessorDTO userAccessorDTO);
-	Task<string> RefreshTokenAsync(RefreshTokenRequest refreshTokenRequest);
+	Task<bool> RefreshTokenAsync(RefreshTokenRequest refreshTokenRequest);
+	Task<string> GenerrateJwt(Guid id, string role);
+	Task<bool> RevokeToken(Guid id);
 }

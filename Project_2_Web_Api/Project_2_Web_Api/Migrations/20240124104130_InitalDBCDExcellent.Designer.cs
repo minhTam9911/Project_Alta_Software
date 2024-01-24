@@ -12,7 +12,7 @@ using Project_2_Web_API.Models;
 namespace Project_2_Web_Api.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240123074105_InitalDBCDExcellent")]
+    [Migration("20240124104130_InitalDBCDExcellent")]
     partial class InitalDBCDExcellent
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -39,7 +39,7 @@ public class BackgroundWorkerService : BackgroundService
 				notificationService.SendAutoNotificationVisit();
 			}
 
-			await Task.Delay(5000, stoppingToken);
+			await Task.Delay(24*60*60*1000, stoppingToken);
 
 		}
 	}

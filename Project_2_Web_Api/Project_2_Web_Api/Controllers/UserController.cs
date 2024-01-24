@@ -165,7 +165,15 @@ public class UserController : ControllerBase
 	{
 		try
 		{
-			return Ok(await userServiceAccessor.GetByMe());
+			if(await userServiceAccessor.IsGuest())
+			{
+				return Ok(await userServiceAccessor.GetByMe());
+			}
+			else
+			{
+				return Unauthorized();
+			}
+			
 		}
 		catch (Exception ex)
 		{

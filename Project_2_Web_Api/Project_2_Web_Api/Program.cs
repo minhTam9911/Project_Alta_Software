@@ -54,6 +54,7 @@ builder.Services.AddScoped<NotificationService, NotificationServiceImpl>();
 //Debug.WriteLine(builder.Configuration.GetSection("AppSettings:Token").Value!);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(option =>
 {
+	option.SaveToken = true;
 	option.TokenValidationParameters = new TokenValidationParameters
 	{
 		ValidateIssuerSigningKey = true,
