@@ -9,7 +9,7 @@ using Project_2_Web_API.Models;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Administrator,Owner")]
+[Authorize]
 public class GrantPermissionController : ControllerBase
 {
 
@@ -69,6 +69,7 @@ public class GrantPermissionController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPost("create")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> Create([FromBody]GrantPermissionDTO request)
 	{
 		
@@ -78,6 +79,7 @@ public class GrantPermissionController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("update/{id}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> Put(int id, [FromBody] GrantPermissionDTO request)
 	{
 		
@@ -87,6 +89,7 @@ public class GrantPermissionController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpDelete("delete/{id}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> Delete(int id)
 	{
 		

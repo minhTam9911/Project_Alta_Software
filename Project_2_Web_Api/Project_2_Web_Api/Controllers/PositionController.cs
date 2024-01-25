@@ -9,7 +9,7 @@ using Project_2_Web_API.Models;
 namespace Project_2_Web_Api.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = "Administrator,Owner")]
+[Authorize]
 public class PositionController : ControllerBase
 {
 
@@ -72,6 +72,7 @@ public class PositionController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPost("create")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> Create([FromBody] PositionDTO request)
 	{
 		
@@ -81,6 +82,7 @@ public class PositionController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpPut("update/{id}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public async Task<IActionResult> Update(int id, [FromBody] PositionDTO request)
 	{
 		
@@ -90,6 +92,7 @@ public class PositionController : ControllerBase
 	[Produces("application/json")]
 	[Consumes("application/json")]
 	[HttpDelete("delete/{id}")]
+	[Authorize(Roles = "Administrator,Owner")]
 	public  async Task<IActionResult> Delete(int id)
 	{
 		
