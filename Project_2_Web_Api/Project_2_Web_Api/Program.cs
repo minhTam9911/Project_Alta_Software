@@ -15,7 +15,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHostedService<BackgroundWorkerService>();
-builder.Services.AddInfrastructrue();
+//builder.Services.AddInfrastructrue();
 builder.Services.AddEndpointsApiExplorer();
 /*builder.Services.Configure<TwilioSettings>(builder.Configuration.GetSection("Twilio"));
 builder.Services.AddTransient<SmsService, SmsServiceImpl>();*/

@@ -1,4 +1,4 @@
-﻿using Quartz;
+﻿/*using Quartz;
 
 namespace Project_2_Web_Api.Configurations;
 
@@ -18,3 +18,4 @@ public class LoginBackground : IJob
 		return Task.CompletedTask;
 	}
 }
+*/

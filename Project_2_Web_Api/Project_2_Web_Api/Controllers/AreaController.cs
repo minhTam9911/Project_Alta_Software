@@ -87,6 +87,22 @@ public class AreaController : ControllerBase
 
 	[Produces("application/json")]
 	[Consumes("application/json")]
+	[HttpGet("detail-staff-in-area/{id}")]
+	public async Task<IActionResult> DetailStaffInAre(int id)
+	{
+		try
+		{
+
+			return await areaService.DetailStaffInAre(id);
+		}
+		catch (Exception ex)
+		{
+			return BadRequest(new { error = ex.Message });
+		}
+	}
+
+	[Produces("application/json")]
+	[Consumes("application/json")]
 	[HttpPost("create")]
 	public async Task<IActionResult> Create([FromBody] AreaDTO request)
 	{

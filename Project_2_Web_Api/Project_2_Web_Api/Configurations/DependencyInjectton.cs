@@ -1,4 +1,4 @@
-﻿using Quartz;
+﻿/*using Quartz;
 
 namespace Project_2_Web_Api.Configurations;
 
@@ -15,3 +15,4 @@ public static class DependencyInjectton
 		services.ConfigureOptions<LoginBackgroundJobSetup>();
 	}
 }
+*/

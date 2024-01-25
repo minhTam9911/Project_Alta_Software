@@ -418,4 +418,35 @@ public class AreaServiceImpl : AreaService
 			return new BadRequestObjectResult(new { msg = ex.Message });
 		}
 	}
+
+	public async Task<IActionResult> DetailStaffInAre(int id)
+	{
+		try
+		{
+
+			if (await db.Areas.AnyAsync() == false)
+			{
+				return new BadRequestObjectResult( new { msg = "Data is null !!!" });
+			}
+			return new OkObjectResult( await db.Areas.Where(x=>x.Id==id).Select(x => new
+			{
+				id = x.Id,
+				code = x.Code,
+				name = x.Name,
+				staffs = x.StaffUsers.Select(i => new
+				{
+					id = i.Id,
+					fullname = i.Fullname,
+					email = i.Email,
+					positionId = i.PositionId,
+					position = i.Position.Name,
+					isstatus = i.IsStatus/*==true? "Activated" : "Not activated"*/
+				}).OrderBy(j=>j.positionId).ToList(),
+			}).FirstOrDefaultAsync());
+		}
+		catch (Exception ex)
+		{
+			return new BadRequestObjectResult( new { msg = ex.Message });
+		}
+	}
 }

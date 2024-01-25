@@ -15,4 +15,5 @@ public interface AreaService
 	Task<dynamic> FindAll();
 	Task<dynamic> FindById(int id);
 	Task<dynamic> FindByName(string name);
+	Task<IActionResult> DetailStaffInAre(int id);
 }

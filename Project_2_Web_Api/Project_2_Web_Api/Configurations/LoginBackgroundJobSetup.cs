@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+﻿/*using Microsoft.Extensions.Options;
 using Project_2_Web_API.Models;
 using Quartz;
 
@@ -16,3 +16,4 @@ public class LoginBackgroundJobSetup : IConfigureOptions<QuartzOptions>
 			.WithSimpleSchedule(x => x.WithIntervalInSeconds(30).RepeatForever()));
 	}
 }
+*/
