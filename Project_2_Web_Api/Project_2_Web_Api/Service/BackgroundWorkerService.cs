@@ -56,7 +56,7 @@ public class BackgroundWorkerService : BackgroundService
 					}
 			}
 
-			await Task.Delay(30000, stoppingToken);
+			await Task.Delay(24*60*60*1000, stoppingToken);
 
 		}
 	}
