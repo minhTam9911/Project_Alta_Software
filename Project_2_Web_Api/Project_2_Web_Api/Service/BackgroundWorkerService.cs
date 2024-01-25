@@ -40,8 +40,8 @@ public class BackgroundWorkerService : BackgroundService
 			using (var scope = service.CreateScope())
 			{
 				var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-				var data = await db.Visits.Where(x => (x.Calendar.Value.Date == DateTime.Now.Date) && x.Status.ToLower() == "Chưa Thăm Viếng".ToLower()).ToListAsync();
-					if (data != null)
+				var data = await db.Visits.Where(x => (x.Calendar.Value.Date == DateTime.Now.Date) && x.Status.ToLower() == "Chưa Viếng Thăm".ToLower()).ToListAsync();
+					if (data != null || data.Count >0)
 					{
 						foreach (var i in data)
 						{
@@ -56,7 +56,7 @@ public class BackgroundWorkerService : BackgroundService
 					}
 			}
 
-			await Task.Delay(24*60*60*1000, stoppingToken);
+			await Task.Delay(30000, stoppingToken);
 
 		}
 	}
