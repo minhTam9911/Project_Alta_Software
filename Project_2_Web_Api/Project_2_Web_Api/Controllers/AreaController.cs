@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_2_Web_Api.DTO;
@@ -92,7 +93,6 @@ public class AreaController : ControllerBase
 	{
 		try
 		{
-
 			return await areaService.DetailStaffInAre(id);
 		}
 		catch (Exception ex)
